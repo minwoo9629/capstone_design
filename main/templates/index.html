@@ -48,12 +48,19 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                    <!-- <ul class="navbar-nav ml-auto mt-2 mt-lg-0"> -->
+                    <ul class="nav nav-tabs ml-auto mt-2 mt-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                            <a class="nav-link active" href="{%url 'index'%}">Home <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Link</a>
+                            <a class="nav-link disabled" style="color: black;">{{user.username}} 로그인 중</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
+                            <form id="logout" method="POST" action="{% url 'logout' %}">
+                                {% csrf_token %} <input type="hidden"/>
+                            </form>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"

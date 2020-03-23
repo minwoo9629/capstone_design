@@ -1,7 +1,11 @@
+</style>
 <h1> 학생 </h1>
 <p>{{user.username}} 로그인중</p>
+<p> 학생 정보 </p>
+<p>전공 : {{user.student.major_code}}</p>
+<p>학년 : {{user.student.grade}}</p>
+<p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p>
 <a href="javascript:{document.getElementById('logout').submit()}">Logout</a>
 <form id="logout" method="POST" action="{% url 'logout' %}">
 	{% csrf_token %} <input type="hidden" />
 </form>
-<p> 학생 정보 </p>
