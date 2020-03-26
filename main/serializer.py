@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
+from student.models import enroll
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id','username','first_name']
+        model = enroll
+        fields = ['user','get_lecture_list']

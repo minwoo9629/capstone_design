@@ -8,6 +8,13 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from .serializer import UserSerializer
 from django.http import HttpResponse, JsonResponse
+import json
+from student.models import enroll
+
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 # Create your views here.
 def main(request):
@@ -35,9 +42,17 @@ def main(request):
 def index(request):
     return render(request,'index.html')
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+    
+class UserList(APIView):
+    def get(self, request):
+        username = request.user.get_username()
+        queryset = enroll.objects.get(user__username=username)
+        serializer_class = UserSerializer(queryset)
+        # lect_array = serializer_class.data["get_lecture+list"].split(",")
+        return Response(serializer_class.data)
 
 class UserPostViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]

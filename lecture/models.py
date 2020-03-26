@@ -22,6 +22,5 @@ class Lecture(models.Model):
 
 class Beacon(models.Model):
     room_code = models.OneToOneField(Room, on_delete=models.CASCADE, to_field='room_code', db_column="room_code")
-    beacon_uuid = models.CharField(max_length=30)
     beacon_major = models.CharField(max_length=30)
     beacon_minor = models.CharField(max_length=30)

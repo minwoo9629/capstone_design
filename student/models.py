@@ -1,18 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User,Group
+from lecture.models import Lecture
 from university.models import College
 
 def user_photo_path(instance, filename):
-    return 'hanbat/{}/{}/{}'.format(instance.major_code,instance.grade,filename)
+    return 'hanbat/{}/{}/{}'.format(instance.major,instance.grade,filename)
 
 class Student(models.Model):
     user = models.OneToOneField(User,verbose_name="학번",on_delete=models.CASCADE, limit_choices_to={'groups__name': "student"})
-    major_choice = College.objects.filter(level__exact=1)
-    print(major_choice)
-    major= models.ForeignKey(College, on_delete=models.PROTECT, to_field="name", db_column="major", null=True)
+    major= models.ForeignKey(College,verbose_name="학과" ,on_delete=models.PROTECT, to_field="name", db_column="major", null=True, limit_choices_to={'level':1})
     grade = models.IntegerField(verbose_name="학년")
     photo = models.ImageField(verbose_name="사진",null=True, upload_to=user_photo_path)
 
 
 class enroll(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="user")
+    user = models.ForeignKey(User,verbose_name="학번",on_delete=models.CASCADE,to_field='username', db_column="user",limit_choices_to={'groups__name': "student"})
+    lecture_list = models.ManyToManyField(Lecture, verbose_name="수강 강의")
+
+    def get_lecture_list(self):
+        return ",".join([str(l) for l in self.lecture_list.all()])

@@ -8,7 +8,7 @@ class LectureAdmin(admin.ModelAdmin):
     list_display = ['name','lecture_code','prof_code','split_code','room_code', 'semester']
 
 class BeaconAdmin(admin.ModelAdmin):
-    list_display = ['room_code','beacon_uuid','beacon_major','beacon_minor']
+    list_display = ['room_code','beacon_major','beacon_minor']
 
 admin.site.register(Room, RoomAdmin)
 admin.site.register(Lecture, LectureAdmin)
