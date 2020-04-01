@@ -9,4 +9,4 @@ class attendance(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="user", limit_choices_to={'groups__name': "student"})
     lecture_code = models.ForeignKey(Lecture, on_delete=models.CASCADE,to_field='lecture_code', db_column="lecture_code")
     time = models.DateTimeField(auto_now_add=True)
-    result = models.CharField(max_length=10,choices=ResultChoice, default=True,)
+    result = models.CharField(max_length=10,choices=ResultChoice, default=True)
