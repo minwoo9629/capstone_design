@@ -7,8 +7,8 @@ class UserLectureSerializer(serializers.Serializer):
         now_room = serializers.CharField(max_length=10)
         now_room_beacon_major = serializers.CharField(max_length=10)
         now_room_beacon_minor = serializers.CharField(max_length=10)
-        start_time = serializers.CharField(max_length=10)
-        end_time = serializers.CharField(max_length=10)
+        start_time = serializers.TimeField()
+        end_time = serializers.TimeField()
 
 class UserListSerializer(serializers.Serializer):
         username = serializers.CharField(max_length=10)
