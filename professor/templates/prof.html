@@ -1,6 +1,6 @@
-<h1> 교수 </h1>
-<p>{{user.username}} 로그인중</p>
-<a href="javascript:{document.getElementById('logout').submit()}">Logout</a>
-<form id="logout" method="POST" action="{% url 'logout' %}">
-	{% csrf_token %} <input type="hidden" />
-</form>
+{% extends 'base.html'%}
+{% block content %}
+<br>
+<button type="button" class="btn btn-outline-dark">금주 출석 조회</button>
+
+{% endblock %}

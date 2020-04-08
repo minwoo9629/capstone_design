@@ -1,8 +1,7 @@
-
 {% load static%}
 <!DOCTYPE html>
 <html lang="ko">
-    
+
 <head>
 
     <meta charset="utf-8">
@@ -26,11 +25,11 @@
 
         <!-- Sidebar -->
         <div class="bg-light border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading">출석 현황 딱대 ^0^ </div>
+            <div class="sidebar-heading">진행 강의</div>
             <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
-                <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
-                <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
+                {%for lecture in lecture_list%}
+                <a href="{% url 'detail' lecture.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.name}}</a>
+                {%endfor%}
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -51,7 +50,8 @@
                     <!-- <ul class="navbar-nav ml-auto mt-2 mt-lg-0"> -->
                     <ul class="nav nav-tabs ml-auto mt-2 mt-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link active" href="{%url 'index'%}">Home <span class="sr-only">(current)</span></a>
+                            <a class="nav-link active" href="{%url 'prof'%}">Home <span
+                                    class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link disabled" style="color: black;">{{user.username}} 로그인 중</a>
@@ -59,7 +59,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
                             <form id="logout" method="POST" action="{% url 'logout' %}">
-                                {% csrf_token %} <input type="hidden"/>
+                                {% csrf_token %} <input type="hidden" />
                             </form>
                         </li>
                         <li class="nav-item dropdown">
@@ -79,12 +79,8 @@
             </nav>
 
             <div class="container-fluid">
-                <h1 class="mt-4">Simple Sidebar</h1>
-                <p>The starting state of the menu will appear collapsed on smaller screens, and will appear
-                    non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
-                <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>. The top navbar is
-                    optional, and just for demonstration. Just create an element with the <code>#menu-toggle</code> ID
-                    which will toggle the menu when clicked.</p>
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
         <!-- /#page-content-wrapper -->

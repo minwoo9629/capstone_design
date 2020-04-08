@@ -40,7 +40,3 @@ def main(request):
         return render(request, 'main.html')
         # GET 요청인 경우 로그인 화면
     return render(request,'main.html')
-
-def index(request):
-    return render(request,'index.html')
-

@@ -9,5 +9,6 @@ urlpatterns = [
     path('rest', include(router.urls)),
     path('api-token-auth/', obtain_auth_token),
     path('api-auth/', include('rest_framework.urls')),
-    path('stdlect/', views.UserList.as_view()),
+    path('stdlect/', views.UserLectureData.as_view()),
+    path('face/', views.UserList.as_view()),
 ]
