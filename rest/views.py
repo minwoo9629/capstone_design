@@ -51,16 +51,6 @@ class UserLectureData(APIView):
                         continue
         
         now_lecture = get_now_lecture(user_enroll,day_lecture)
-        # a = day_lecture.get(room_code="R003")
-        # aid = a.id
-        # enrollqueryset = enroll.objects.filter(lecture_list__id=aid)
-        # uudata = []
-        # for z in enrollqueryset:
-        #     udata = {'username':z.user.username,'userface':z.user.student.photo}
-        #     uudata.append(list(udata.items()))
-
-            
-        # print(uudata)
 
         if now_lecture is not None:
             # 강의실로 접근
@@ -68,7 +58,7 @@ class UserLectureData(APIView):
             # Beacon 값
             now_room_beacon_major = now_lecture.room_code.beacon.beacon_major
             now_room_beacon_minor = now_lecture.room_code.beacon.beacon_minor
-            user_data = {'username':username,'now_lecture':now_lecture.name,'now_room':now_room.room_code,'now_room_beacon_major':now_room_beacon_major,'now_room_beacon_minor':now_room_beacon_minor,'start_time':now_lecture.start_time,'end_time':now_lecture.end_time}
+            user_data = {'username':username,'now_lecture':now_lecture.name,'now_lecture_code':now_lecture.lecture_code,'now_room':now_room.room_code,'now_room_beacon_major':now_room_beacon_major,'now_room_beacon_minor':now_room_beacon_minor,'start_time':now_lecture.start_time,'end_time':now_lecture.end_time}
             serializer_class = UserLectureSerializer(user_data)
             return Response(serializer_class.data)
         else:

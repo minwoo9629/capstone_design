@@ -11,3 +11,7 @@
 <form id="logout" method="POST" action="{% url 'logout' %}">
 	{% csrf_token %} <input type="hidden" />
 </form>
+<a href="javascript:{document.getElementById('attend').submit()}">출석</a>
+<form id="attend" method="POST" action="{% url 'attend' %}">
+	{% csrf_token %} <input type="hidden"/>
+</form>
