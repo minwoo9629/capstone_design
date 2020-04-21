@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 #-------------------------------------------------
 
 import datetime
-from student.models import enroll
+# from student.models import enroll
 from lecture.models import Lecture, Room, Beacon
 from django.http import Http404
 from rest_framework.views import APIView

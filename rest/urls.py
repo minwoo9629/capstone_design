@@ -10,5 +10,5 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token),
     path('api-auth/', include('rest_framework.urls')),
     path('stdlect/', views.UserLectureData.as_view()),
-    path('face/', views.UserList.as_view()),
+    path('attend/', views.AttendData.as_view()),
 ]

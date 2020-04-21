@@ -6,7 +6,9 @@ from .models import Professor
 # Create your views here.
 def prof(request):
     username = request.user.get_username()
-    prof_code = Professor.objects.get(user__username=username).prof_code
+    # 교수의 username을 이용해 얻은 객체에서 교수코드를 얻음.
+    prof_code = Professor.objects.get(username__username=username).code
+    # 개설된 강의 중 교수가 가르치는 강의 객체들을 얻음.
     lecture_list = Lecture.objects.filter(prof_code=prof_code)
     return render(request,'prof.html',{'lecture_list':lecture_list})
 
@@ -17,7 +19,7 @@ def logout(request):
     return render(request, 'main.html')
 
 def detail(request, lecture_code):
-    lecture_detail = get_object_or_404(Lecture, lecture_code=lecture_code)
+    lecture_detail = get_object_or_404(Lecture, code=lecture_code)
     return render(request, 'detail.html',{'lecture_detail':lecture_detail})
 
 
