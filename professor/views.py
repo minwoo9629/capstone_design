@@ -1,15 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth
 from django.contrib.auth.models import User
-from lecture.models import Lecture
+from lecture.models import GiveLectures
 from .models import Professor
 # Create your views here.
 def prof(request):
     username = request.user.get_username()
-    # 교수의 username을 이용해 얻은 객체에서 교수코드를 얻음.
-    prof_code = Professor.objects.get(username__username=username).code
+    
     # 개설된 강의 중 교수가 가르치는 강의 객체들을 얻음.
-    lecture_list = Lecture.objects.filter(prof_code=prof_code)
+    lecture_list = GiveLectures.objects.filter(username=username)
     return render(request,'prof.html',{'lecture_list':lecture_list})
 
 def logout(request):

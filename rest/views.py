@@ -56,9 +56,11 @@ class UserLectureData(APIView):
             # 강의실에 대응되는 Beacon 값
             beacon_major = room_code.beacon.major
             beacon_minor = room_code.beacon.minor
+            start_time = current_lecture.start_time.strftime("%H:%M")
+            end_time = current_lecture.end_time.strftime("%H:%M")
 
             # REST API를 통해 Android로 전달할 data
-            data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':current_lecture.start_time,'end_time':current_lecture.end_time}
+            data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time,'end_time':end_time}
             serializer_class = UserLectureSerializer(data)
             return Response(serializer_class.data, status=status.HTTP_200_OK)
         else:
@@ -76,15 +78,18 @@ class AttendData(APIView):
         return Response(serializer_class.data)
     
     def post(self, request):
+        username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
-        a = request.data['result']
+        result_data = request.data['result']
         try:
-            attend = attendance.objects.get(time=ymd)
-            b = attend.result
-            c = json.loads(a)
-            query = b.update(c)
-            d = json.dumps(b)
-            e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': d}
+            attend = attendance.objects.filter(time=ymd).get(username=username)
+            attend_result = attend.result
+            d = json.loads(attend_result)
+            c = json.loads(result_data)
+            f = c.update(d)
+            g = json.dumps(f)
+            
+            e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': g}
             hi = "hi"
             serializer = AttendSerializer(attend, data=e)
             # 직접 유효성 검사

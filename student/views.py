@@ -8,8 +8,7 @@ from lecture.models import Lecture
 def student(request):
     # 현재 접속 중인 학생의 학번 추출
     username = request.user.get_username()
-    attend = attendance.objects.get(username=username)
-    return render(request,'student.html',{'attend':attend})
+    return render(request,'student.html')
 
 def logout(request):
     if request.method == 'POST':

@@ -19,7 +19,7 @@ class Lecture(models.Model):
     room_code = models.ForeignKey(Room, on_delete=models.CASCADE, to_field='code', db_column="room_code")
     semester = models.CharField(verbose_name="학기",max_length=20, choices=SEMESTER_CHOICES)
     day_of_the_week = models.CharField(verbose_name="수업 요일", max_length=10, null=True)
-    start_time = models.TimeField(verbose_name="수업 시작 시간",auto_now=False, auto_now_add=False, default="00:00")
+    start_time = models.TimeField(verbose_name="수업 시작 시간",auto_now=False, auto_now_add=False,default="00:00")
     end_time = models.TimeField(verbose_name="수업 종료 시간",auto_now=False, auto_now_add=False, default="00:00")
     
 
@@ -33,5 +33,6 @@ class GiveLectures(models.Model):
 
 class Beacon(models.Model):
     room_code = models.OneToOneField(Room, verbose_name="강의실 코드", on_delete=models.CASCADE, to_field='code', db_column="room_code")
+    uuid = models.CharField(verbose_name="비콘 UUID 값", max_length=50, null=True, default="-")
     major = models.CharField(verbose_name="비콘 major 값",max_length=10)
     minor = models.CharField(verbose_name="비콘 minor 값",max_length=10)
