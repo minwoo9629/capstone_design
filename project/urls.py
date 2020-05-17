@@ -9,6 +9,8 @@ urlpatterns = [
     path('',include('manager.urls')),
     path('',include('student.urls')),
     path('',include('professor.urls')),
+    path('',include('rest.urls')),
+    path('',include('recognition.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
