@@ -4,9 +4,11 @@ from django.contrib.auth.models import User
 from student.models import Student, TakeLectures
 from lecture.models import Lecture, Room, Beacon
 from attendance.models import attendance
-from .serializer import UserLectureSerializer,MessageSerializer, AttendSerializer
+from .serializer import MessageSerializer, AttendSerializer, LectureSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,6 +24,19 @@ today = day_of_week[today_num]
 # 현재 시간(hour) 값
 current_time = time.strftime('%H:%M', time.localtime(time.time()))
 
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'uuid' : user.student.college.uuid,
+        })
+        
+
+
 class UserLectureData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
@@ -33,40 +48,66 @@ class UserLectureData(APIView):
         student = Student.objects.get(username=username)
         today_student_lectures = student.take_lectures.filter(day_of_the_week=today)
         # 현재 시간에 따른 수강해야할 강의 목록
-        a = today_student_lectures.filter(start_time__gte="14:00")
+        lecture_list = today_student_lectures.filter(end_time__gte="14:00")
         
-        def get_lecture(a):
-            b = a.order_by('start_time')
-            if len(b) != 1:
-                return b[0],b[1]
-            else:
-                return b[0], None
+        def get_lecture(lecture_list):
+            sequence = []
+            lecture_id = []
+            b = lecture_list.order_by('start_time')
+            for num in range(len(b)):
+                sequence.append(num+1)
 
-        if a.exists():
-            current_lecture, next_lecture = get_lecture(a)
-        else:
-            current_lecture, next_lecture = None, None
-        # 학생이 현재 들어야 할 수업 얻기 없으면 None
-        if current_lecture is not None:
-            # 현재 수강해야하는 강의의 강의실
-            room_code = current_lecture.room_code
-            building = Room.objects.get(code=room_code).building
-            number = Room.objects.get(code=room_code).number
-            room_name = building + str(" ") + number
-            # 강의실에 대응되는 Beacon 값
-            beacon_major = room_code.beacon.major
-            beacon_minor = room_code.beacon.minor
-            start_time = current_lecture.start_time.strftime("%H:%M")
-            end_time = current_lecture.end_time.strftime("%H:%M")
+            for lecture in lecture_list:
+                lecture_id.append(lecture.id)
+            
+            lecture_data = dict(zip(sequence,lecture_id))
+            return lecture_data
 
-            # REST API를 통해 Android로 전달할 data
-            data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time,'end_time':end_time}
-            serializer_class = UserLectureSerializer(data)
-            return Response(serializer_class.data, status=status.HTTP_200_OK)
+        if lecture_list is not None:
+            lecture_data = get_lecture(lecture_list)
+            return Response(lecture_data, status=status.HTTP_200_OK)
         else:
-            data = {'username':username, 'message': '현재 수강할 강의가 없습니다.'}
+            data = {'message': '현재 수강할 강의가 없습니다.'}
             serializer_class = MessageSerializer(data)
-            return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT) 
+            
+
+class LectureData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        username = request.user.get_username()
+        lecture_id = request.data['lecture_id']
+        name = lecture.name
+        term = lecture.term
+        count = lecture.count
+        start_time = lecture.start_time.strftime("%H:%M")
+        beacon_major = lecture.room_code.beacon.major
+        beacon_minor = lecture.room_code.beacon.minor
+        data = {'name':name, 'term':term, 'count':count, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time}
+        serializer_class = LectureSerializer(data)
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+    # 학생이 현재 들어야 할 수업 얻기 없으면 None
+        # if current_lecture is not None:
+        #     # 현재 수강해야하는 강의의 강의실
+        #     room_code = current_lecture.room_code
+        #     building = Room.objects.get(code=room_code).building
+        #     number = Room.objects.get(code=room_code).number
+        #     room_name = building + str(" ") + number
+        #     # 강의실에 대응되는 Beacon 값
+        #     beacon_major = room_code.beacon.major
+        #     beacon_minor = room_code.beacon.minor
+        #     start_time = current_lecture.start_time.strftime("%H:%M")
+        #     end_time = current_lecture.end_time.strftime("%H:%M")
+
+        #     # REST API를 통해 Android로 전달할 data
+        #     data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time,'end_time':end_time}
+        #     serializer_class = LectureSerializer(data)
+        #     return Response(serializer_class.data, status=status.HTTP_200_OK)
+        # else:
+        #     data = {'username':username, 'message': '현재 수강할 강의가 없습니다.'}
+        #     serializer_class = MessageSerializer(data)
+        #     return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT) 
     
 class AttendData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
@@ -105,6 +146,8 @@ class AttendData(APIView):
                 serializer.save()       # 저장
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class UserPostViewSet(viewsets.ModelViewSet):

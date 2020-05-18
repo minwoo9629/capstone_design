@@ -7,8 +7,9 @@ router = DefaultRouter()
 # router.register('main', views.UserViewSet)
 urlpatterns = [
     path('rest', include(router.urls)),
-    path('api-token-auth/', obtain_auth_token),
     path('api-auth/', include('rest_framework.urls')),
+    path('api-token-auth/', views.CustomAuthToken.as_view()),
     path('stdlect/', views.UserLectureData.as_view()),
     path('attend/', views.AttendData.as_view()),
+    path('lecture/', views.LectureData.as_view()),
 ]

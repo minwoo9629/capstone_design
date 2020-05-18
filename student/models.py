@@ -23,7 +23,8 @@ def user_photo_path(instance, filename):
 class Student(models.Model):
     YEAR_IN_SCHOOL_CHOICES = [ ('FRESHMAN', '1'),('SOPHOMORE', '2'),('JUNIOR', '3'),('SENIOR', '4')]
     username = models.OneToOneField(User,verbose_name="학번",on_delete=models.CASCADE, to_field='username', db_column="username", unique=True, limit_choices_to={'groups__name': "student"})
-    major= models.ForeignKey(College,verbose_name="학과" ,on_delete=models.PROTECT, to_field="name", db_column="major", null=True, limit_choices_to={'level':1})
+    college = models.ForeignKey(College,verbose_name="학교", on_delete=models.SET_NULL, related_name="college",to_field="name", db_column="college", null=True, limit_choices_to={'level':0})
+    major= models.ForeignKey(College,verbose_name="학과",on_delete=models.SET_NULL, related_name="major",to_field="name", db_column="major", null=True, limit_choices_to={'level':2})
     grade = models.CharField(verbose_name="학년", max_length=10, choices=YEAR_IN_SCHOOL_CHOICES)
     photo = models.ImageField(verbose_name="사진",null=True, upload_to=user_photo_path, storage=OverwriteStorage())
     take_lectures = models.ManyToManyField(Lecture, verbose_name="수강 강의", through='TakeLectures', through_fields=('username','lectures'))

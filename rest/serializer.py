@@ -2,16 +2,14 @@ from rest_framework import serializers
 from student.models import Student
 from attendance.models import attendance
 
-class UserLectureSerializer(serializers.Serializer):
-        username = serializers.CharField(max_length=10)
-        lecture = serializers.CharField(max_length=20)
-        lecture_code = serializers.CharField(max_length=20)
-        room_code = serializers.CharField(max_length=10)
-        room_name = serializers.CharField(max_length=10)
+class LectureSerializer(serializers.Serializer):
+        name = serializers.CharField(max_length=20)
+        term = serializers.CharField(max_length=10)
+        count = serializers.IntegerField()
         beacon_major = serializers.CharField(max_length=10)
         beacon_minor = serializers.CharField(max_length=10)
         start_time = serializers.TimeField()
-        end_time = serializers.TimeField()
+
 
 # 현재 수강할 강의가 없는 경우 message 전달
 class MessageSerializer(serializers.Serializer):
