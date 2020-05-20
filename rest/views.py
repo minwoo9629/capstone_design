@@ -121,18 +121,21 @@ class AttendData(APIView):
     def post(self, request):
         username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        # 요청 받은 출석 결과
         result_data = request.data['result']
         try:
             attend = attendance.objects.filter(time=ymd).get(username=username)
+
+            # 기존의 출석 결과
             attend_result = attend.result
-            d = json.loads(attend_result)
-            c = json.loads(result_data)
-            f = c.update(d)
-            g = json.dumps(f)
+            # 요청 받은 출석 결과 json -> dict
+            result_data = json.loads(result_data)
+            attend_result.update(result_data)
+            result = json.dumps(attend_result)
             
-            e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': g}
+            edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
             hi = "hi"
-            serializer = AttendSerializer(attend, data=e)
+            serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
             if serializer.is_valid():
                 # 저장
