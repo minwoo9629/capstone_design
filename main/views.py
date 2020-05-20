@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 #-------------------------------------------------
 
 import datetime
-from student.models import enroll
+#from student.models import enroll
 from lecture.models import Lecture, Room, Beacon
 from django.http import Http404
 from rest_framework.views import APIView
@@ -41,6 +41,4 @@ def main(request):
         # GET 요청인 경우 로그인 화면
     return render(request,'main.html')
 
-def index(request):
-    return render(request,'index.html')
 

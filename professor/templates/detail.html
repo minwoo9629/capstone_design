@@ -16,7 +16,16 @@
 </style>
 <div class="container">
     <div class='row' >
-        
+        <div class="col" id="check" style="border-right:1px solid black;" >
+            <form method="POST" >
+                {% csrf_token %}
+                <p>출결 로그 조회</p>
+                <input type="date" id="choice_date" size="10">
+                <button type='submit'  class="btn btn-outline-primary">선택</button>
+                
+                <p id='test'> </p>
+            </form>
+        </div>
         <div class="col" id="time">
 
             <label>출석 체크 반복 시간<input type="time" value='09:00 id=' start'></label>
@@ -29,6 +38,17 @@
     </div>
 </div>
 
+<table>
+    <thead>
+            <th>학번</th>
+            <th>출결</th>
+    </thead>
 
-<br>
+    <tbody> 
+        <tr>
+        <td>{{attend.username}}</td>
+        <td>{{attend.result}}</td>
+    </tr>
+    </tbody>
+</table>
 {% endblock %}

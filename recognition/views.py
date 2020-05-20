@@ -17,6 +17,6 @@ def recognition(request):
 #	image = a.user.student.photo
 	#print(udata)
 	#print(image)
-	detect_face(**udata)
+	#detect_face(**udata)
 	return render(request, "check.html")
 	#return None

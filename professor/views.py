@@ -1,9 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth
 from django.contrib.auth.models import User
+from lecture.models import GiveLectures, Lecture
+from .models import Professor
+from attendance.models import attendance
 # Create your views here.
 def prof(request):
-    return render(request,'prof.html')
+    username = request.user.get_username()
+    lecture_list = GiveLectures.objects.filter(username=username)
+    return render(request,'prof.html', {'lecture_list':lecture_list})
 
 def logout(request):
     if request.method == 'POST':
@@ -11,3 +16,9 @@ def logout(request):
         return redirect('main')
     return render(request, 'main.html')
 
+
+def detail(request, lecture_id):
+    lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
+    attend = attendance.objects.filter(lecture=lecture_detail)
+    
+    return render(request, 'detail.html', {'attend':attend})

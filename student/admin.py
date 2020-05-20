@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Student, enroll
+from .models import Student, TakeLectures
 # Register your models here.
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['user', 'grade']
+    list_display = ['grade']
 
-class EnrollAdmin(admin.ModelAdmin):
-    list_display = ['user','get_lecture_list']
+class TakeLecturesAdmin(admin.ModelAdmin):
+    list_display = ['lectures']
 
 admin.site.register(Student, StudentAdmin)
-admin.site.register(enroll,EnrollAdmin)
+admin.site.register(TakeLectures,TakeLecturesAdmin)

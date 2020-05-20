@@ -1,5 +1,4 @@
-import face_recognition
-import cv2
+
 from django.conf import settings
 from attendance.models import attendance
 from student.models import Student

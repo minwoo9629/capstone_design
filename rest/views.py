@@ -1,68 +1,110 @@
 from django.shortcuts import render
 from django.contrib import auth
 from django.contrib.auth.models import User
-from student.models import enroll
+from student.models import Student
 from lecture.models import Lecture, Room, Beacon
-from .serializer import UserSerializer
+from attendance.models import attendance
+from .serializer import UserLectureSerializer,MessageSerializer, AttendSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets
-from rest_framework import status
-import datetime
+from rest_framework import viewsets, status
+import datetime, time
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
-class UserList(APIView):
+# 현재 날짜에 따른 요일 값 얻기
+day_of_week = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+today_num = datetime.datetime.today().weekday()
+today = day_of_week[today_num]
+# 현재 시간(hour) 값
+current_time = time.strftime('%H:%M', time.localtime(time.time()))
+
+class UserLectureData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        # 현재 날짜에 따른 요일 값 얻기
-        day_of_week = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-        today_num = datetime.datetime.today().weekday()
-        today = day_of_week[today_num]
-        # 현재 시간(hour) 값
-        current_time = datetime.datetime.now().hour
         # 로그인 중인 학생 얻기(username)
         username = request.user.get_username()
 
-        # 얻은 학생의 수강하는 과목 얻기
-        user_enroll = enroll.objects.get(user__username=username)
+        # 금일 학생의 수강 과목
+        student = Student.objects.get(username=username)
+        today_student_lectures = student.take_lectures.filter(day_of_the_week=today)
+        # 현재 시간에 따른 수강해야할 강의 목록
+        a = today_student_lectures.filter(start_time__gte="14:00")
         
-        # 현재 시작할 강의 찾기 ex) 현재 시간 08:00 현재 요일 : 월요일
-        # 월요일 오전에 시작하는 강의 찾기
-        def get_lecture_by_today_current_time(Lecture):
-            if current_time <= 12:
-                # 그 날 오전 강의 return
-                return Lecture.objects.filter(day_of_the_week=today).filter(start_time="09:00")
+        def get_lecture(a):
+            b = a.order_by('start_time')
+            if len(b) != 1:
+                return b[0],b[1]
             else:
-                # 그 날 오후 강의 return
-                return Lecture.objects.filter(day_of_the_week=today).filter(start_time="14:00")
-        # 그 날의 오전 강의        
-        day_lecture = get_lecture_by_today_current_time(Lecture)
-        # 
-        def get_now_lecture(user_enroll,day_lecture):
-            for l in user_enroll.lecture_list.all():
-                for ll in day_lecture.all():
-                    if str(ll) == str(l):
-                        return l
-                    else:
-                        continue
-        now_lecture = get_now_lecture(user_enroll,day_lecture)
-        # 강의실로 접근
-        now_room = now_lecture.room_code
-        # Beacon 값
-        now_room_beacon_major = now_lecture.room_code.beacon.beacon_major
-        now_room_beacon_minor = now_lecture.room_code.beacon.beacon_minor
-        user_data = {'username':username,'now_lecture':now_lecture.name,'now_room':now_room.room_code,'now_room_beacon_major':now_room_beacon_major,'now_room_beacon_minor':now_room_beacon_minor}
-        serializer_class = UserSerializer(user_data)
+                return b[0], None
+
+        if a.exists():
+            current_lecture, next_lecture = get_lecture(a)
+        else:
+            current_lecture, next_lecture = None, None
+        # 학생이 현재 들어야 할 수업 얻기 없으면 None
+        if current_lecture is not None:
+            # 현재 수강해야하는 강의의 강의실
+            room_code = current_lecture.room_code
+            building = Room.objects.get(code=room_code).building
+            number = Room.objects.get(code=room_code).number
+            room_name = building + str(" ") + number
+            # 강의실에 대응되는 Beacon 값
+            beacon_major = room_code.beacon.major
+            beacon_minor = room_code.beacon.minor
+            start_time = current_lecture.start_time.strftime("%H:%M")
+            end_time = current_lecture.end_time.strftime("%H:%M")
+
+            # REST API를 통해 Android로 전달할 data
+            data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time,'end_time':end_time}
+            serializer_class = UserLectureSerializer(data)
+            return Response(serializer_class.data, status=status.HTTP_200_OK)
+        else:
+            data = {'username':username, 'message': '현재 수강할 강의가 없습니다.'}
+            serializer_class = MessageSerializer(data)
+            return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT)
+    
+class AttendData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        username = request.user.get_username()
+        attend = attendance.objects.filter(username=username)
+        serializer_class = AttendSerializer(attend, many=True)
         return Response(serializer_class.data)
-
-# class UserViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-
+    
+    def post(self, request):
+        username = request.user.get_username()
+        ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        result_data = request.data['result']
+        try:
+            attend = attendance.objects.filter(time=ymd).get(username=username)
+            attend_result = attend.result
+            d = json.loads(attend_result)
+            c = json.loads(result_data)
+            f = c.update(d)
+            g = json.dumps(f)
+            
+            e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': g}
+            hi = "hi"
+            serializer = AttendSerializer(attend, data=e)
+            # 직접 유효성 검사
+            if serializer.is_valid():
+                # 저장
+                serializer.save()       
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except ObjectDoesNotExist:
+            serializer = AttendSerializer(data=request.data)
+            if serializer.is_valid():   # 직접 유효성 검사
+                serializer.save()       # 저장
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserPostViewSet(viewsets.ModelViewSet):
