@@ -1,0 +1,65 @@
+{% extends 'base.html'%}
+{% block content%}
+{% load static %}
+<!-- <link href="style" href="{% static 'css/test.css' %}"> */ -->
+<br>
+<style>
+    .row {
+        border: 3px solid black;
+
+    }
+
+    .col {
+        box-sizing: border-box;
+
+        margin: 15px;
+    }
+</style>
+<div class="container">
+    <div class='row'>
+        <div class="col" id="check" style="border-right:1px solid black;">
+            <form method="POST" >
+                {% csrf_token %}
+                <p>출결 로그 조회</p>
+                {{form}}
+                <button type='submit' class="btn btn-outline-primary">선택</button>
+
+                <p id='test'> </p>
+            </form>
+        </div>
+        <div class="col" id="time">
+            <form method="POST">
+                {% csrf_token %}
+            <label>수업 시간 {{lecture_detail.start_time}} ~ {{lecture_detail.end_time}} <button type="submit" class="btn btn-outline-primary">수정</button></label>
+            </form>
+            <form>
+            <label>출석 체크 반복 시간<input type="time" value='09:00 id=' start'></label>
+            <br>
+            <label>횟수<input type="number" value="5" min="0" id='term'></label>
+            <br>
+            <button type="submit"  class="btn btn-outline-primary">저장</button>
+        </form>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <th scope="col">#</th>
+        <th scope="col">학번</th>
+        <th scope="col">출결</th>
+    </thead>
+
+    <tbody>
+        
+        {%for attend in attends%}
+        <tr>
+            <td>{{attend.id}}</td>
+            <td>{{attend.username}}</td>
+            <td>{{attend.result}}</td>
+        </tr>
+        {%endfor%}
+
+    </tbody>
+</table>
+{% endblock %}
