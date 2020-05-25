@@ -78,6 +78,7 @@ class LectureData(APIView):
     def get(self, request):
         username = request.user.get_username()
         lecture_id = request.data['lecture_id']
+        lecture = Lecture.objects.get(id=lecture_id)
         name = lecture.name
         term = lecture.term
         count = lecture.count
