@@ -9,6 +9,14 @@
 <a href="javascript:{document.getElementById('logout').submit()}">Logout</a>
 <form id="logout" method="POST" action="{% url 'logout' %}">
 	{% csrf_token %} <input type="hidden" />
+{% for attend in attend%}
 {{attend.id}}
 {{attend.result}}
+{%endfor%}
+<script>
+    JSON.parse("{{attend.result}}", (key, value) => {
+        console.log(key, value);
+        return value;
+});
+</script>
 </form>
