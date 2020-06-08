@@ -3,66 +3,7 @@
 <br>
 <!-- <button type="button" class="btn btn-outline-dark">금주 출석 조회</button> -->
 <br>
-<!-- <p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p> -->
-<div class="container">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>제목</th>
-                <th>작성자</th>
-                <th>작성일</th>
-                <th>조회수</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for attend in posts %}
-            <tr>
-                <td>{{attend.id}}</td>
-                <td>hi</td>
-                <td><a style="color:black; text-decoration: none;" href="{% url 'detail' board.id%}">{{attend.id}}</a>{{attend.id}}</td>
-                <td>{{attend.username}}</td>
-                <td>{{attend.time}}</td>
-                <td>{{attend.result}}</td> 
-            </tr>
-            {%endfor%}
-        </tbody>
-    </table>
-    <hr>
-    <div class="container">
-        <br><br>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <a class="page-link" href="?page=1">처음</a>
-                {%if post.has_previous%}
-                <a class="page-link" href="?page={{post.previous_page_number}}">이전</a>
-                {% else %}
-                <a class="page-link" href="#">이전</a>
-                {%endif%}
-                {% for page in page_range%}
-                {%if page == post.number%}
-                <li class="page-item active" aria-current="page" {% if page == post.number %}class="active"
-                    {% endif %}>
-                    <a class="page-link" href="?page={{page}}">{{page}}<span class="sr-only">(current)</span></a>
-                </li>
-                {%else%}
-                <li class="page-item" {% if page == post.number %}class="active" {% endif %}>
-                    <a class="page-link" href="?page={{page}}">{{page}}</a>
-                </li>
-                {%endif%}
-
-                {% endfor %}
-                {%if post.has_next%}
-                <a class="page-link" href="?page={{post.next_page_number}}">다음</a>
-                {%else%}
-                <a class="page-link" href="#">다음</a>
-                {%endif%}
-                <a class="page-link" href="?page={{post.paginator.num_pages}}">끝</a>
-            </ul>
-        </nav>
-
-    </div>
-</div>
+<p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p>
 {% endblock %}
 
 

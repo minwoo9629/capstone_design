@@ -41,13 +41,3 @@ def main(request):
         return render(request, 'main.html')
         # GET 요청인 경우 로그인 화면
     return render(request,'main.html')
-
-def detail(request, lecture_id):
-    lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
-    attend = attendance.objects.filter(lecture=lecture_id)
-    if request.user.groups.filter(name = 'student').exists():
-        return render(request, 'student_detail.html',{'lecture_detail':lecture_detail, 'attend':attend})
-    elif request.user.groups.filter(name = 'professor').exists():
-        return render(request, 'prof_detail.html',{'lecture_detail':lecture_detail, 'attend':attend})
-    else:
-        return render(request,'main.html')
