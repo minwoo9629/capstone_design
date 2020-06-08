@@ -19,9 +19,9 @@ def logout(request):
         return redirect('main')
     return render(request, 'main.html')
 
-def detail(request, lecture_id):
-    lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
-    attend = attendance.objects.filter(lecture=lecture_id)
-    return render(request, 'detail.html',{'lecture_detail':lecture_detail, 'attend':attend})
+# def detail(request, lecture_id):
+#     lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
+#     attend = attendance.objects.filter(lecture=lecture_id)
+#     return render(request, 'detail.html',{'lecture_detail':lecture_detail, 'attend':attend})
 
 
