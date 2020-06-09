@@ -88,27 +88,6 @@ class LectureData(APIView):
         data = {'name':name, 'term':term, 'count':count, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time}
         serializer_class = LectureSerializer(data)
         return Response(serializer_class.data, status=status.HTTP_200_OK)
-    # 학생이 현재 들어야 할 수업 얻기 없으면 None
-        # if current_lecture is not None:
-        #     # 현재 수강해야하는 강의의 강의실
-        #     room_code = current_lecture.room_code
-        #     building = Room.objects.get(code=room_code).building
-        #     number = Room.objects.get(code=room_code).number
-        #     room_name = building + str(" ") + number
-        #     # 강의실에 대응되는 Beacon 값
-        #     beacon_major = room_code.beacon.major
-        #     beacon_minor = room_code.beacon.minor
-        #     start_time = current_lecture.start_time.strftime("%H:%M")
-        #     end_time = current_lecture.end_time.strftime("%H:%M")
-
-        #     # REST API를 통해 Android로 전달할 data
-        #     data = {'username':username, 'lecture':current_lecture.name, 'lecture_code':current_lecture.code, 'room_code':room_code, 'room_name':room_name, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time,'end_time':end_time}
-        #     serializer_class = LectureSerializer(data)
-        #     return Response(serializer_class.data, status=status.HTTP_200_OK)
-        # else:
-        #     data = {'username':username, 'message': '현재 수강할 강의가 없습니다.'}
-        #     serializer_class = MessageSerializer(data)
-        #     return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT) 
     
 class AttendData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
@@ -122,10 +101,12 @@ class AttendData(APIView):
     def post(self, request):
         username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        lecture_id = request.data['lecture']
         # 요청 받은 출석 결과
         result_data = request.data['result']
+
         try:
-            attend = attendance.objects.filter(time=ymd).get(username=username)
+            attend = attendance.objects.filter(lecture_id=lecture_id).filter(time=ymd).get(username=username)
 
             # 기존의 출석 결과 str->dict
             attend_result = json.loads(attend.result)
