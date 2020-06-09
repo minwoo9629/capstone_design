@@ -49,5 +49,4 @@ def detail(request, lecture_id):
     page_range = paginator.page_range[start_index:end_index]
     
     return render(request,'student_detail.html',{'lecture_list':lecture_list, 'group':group_value[0]["name"], 'posts':posts,'page_range':page_range,'attend_list':attend_list})
-    # return render(request, 'student_detail.html',{'lecture_list':lecture_list, 'group':group_value[0]["name"], 'lecture_detail':lecture_detail, 'attend':attend})
 
