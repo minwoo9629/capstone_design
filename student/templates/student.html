@@ -1,14 +1,9 @@
-</style>
-<h1> 학생 </h1>
-<p>{{user.username}} 로그인중</p>
-<p> 학생 정보 </p>
-<p>전공 : {{user.student.major}}</p>
-<p>학년 : {{user.student.grade}}</p>
-<p>수강 과목 :</p>
+{% extends 'base.html'%}
+{% block content %}
+<br>
+<!-- <button type="button" class="btn btn-outline-dark">금주 출석 조회</button> -->
+<br>
 <p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p>
-<a href="javascript:{document.getElementById('logout').submit()}">Logout</a>
-<form id="logout" method="POST" action="{% url 'logout' %}">
-	{% csrf_token %} <input type="hidden" />
-{{attend.id}}
-{{attend.result}}
-</form>
+{% endblock %}
+
+

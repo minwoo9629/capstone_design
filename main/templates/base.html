@@ -3,7 +3,6 @@
 <html lang="ko">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -27,9 +26,17 @@
         <div class="bg-light border-right" id="sidebar-wrapper">
             <div class="sidebar-heading">진행 강의</div>
             <div class="list-group list-group-flush">
+                {% if group == "student" %}
                 {%for lecture in lecture_list%}
-                <a href="{%url 'detail' lecture.lectures.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
+                <a href="{%url 'student_detail' lecture.lectures.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
                 {%endfor%}
+                {% elif group == "professor" %}
+                {%for lecture in lecture_list%}
+                <a href="{%url 'prof_detail' lecture.lectures.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
+                {%endfor%}
+                {%endif%}
+                
+
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
