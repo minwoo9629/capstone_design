@@ -1,20 +1,26 @@
-
+import face_recognition
+import cv2
 from django.conf import settings
 from attendance.models import attendance
 from student.models import Student
 from django.contrib.auth.models import User
 from lecture.models import Lecture
 
-def detect_face(**user_data):
-	#user_data = User.objects.filter(groups__name="student")
-	video_path = "media/video/"
-	lect = Lecture.objects.get(lecture_code="L001")
-	input_movie = cv2.VideoCapture(video_path+"untitled.mp4")
-	length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
+def detect_face(user_data, lec):
+	
+	video_path = "http://192.168.0.5:55615/videostream.cgi?user=admin&pwd=isl7528727"
+	input_movie = cv2.VideoCapture(video_path)
+	
+
+	height = int(input_movie.get(cv2.CAP_PROP_FRAME_HEIGHT))
+	width = int(input_movie.get(cv2.CAP_PROP_FRAME_WIDTH))
+	frame = int(input_movie.get(cv2.CAP_PROP_FPS))
+	fourcc = cv2.VideoWriter_fourcc(*'XVID')
+	output_movie = cv2.VideoWriter('media/video/'+str(lec.id) + '.avi', fourcc, frame, (width, height))
 	names = []
 	encodings = []
 	
-	for key in user_data.keys():
+	for key in user_data:
 		names.append(key)
 		image_path = "media/" + user_data[key]
 		image = face_recognition.load_image_file(image_path)
@@ -25,9 +31,10 @@ def detect_face(**user_data):
 	
 	face_locations = []
 	face_encodings = []
+	face_names = []
 	frame_number = 0
-	
-	while True:
+	limit_frame = 500
+	while frame_number < limit_frame:
 		ret, frame = input_movie.read()
 		frame_number += 1
 		if not ret:
@@ -35,6 +42,10 @@ def detect_face(**user_data):
 		rgb_frame = frame[:, :, ::-1]
 		face_locations = face_recognition.face_locations(rgb_frame)
 		face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
+		
+		if cv2.waitKey(1) & 0xff == ord('q'):
+			break
+
 
 		for face_encoding in face_encodings:
 			matchs = face_recognition.compare_faces(encodings, face_encoding, tolerance=0.45)
@@ -42,32 +53,28 @@ def detect_face(**user_data):
 			for match in matchs:
 				if match: 
 					numbering[check_point] += 1
+					face_names.append(names[check_point])
 				check_point += 1
 			
 	
-		print("Writing frame {} / {}".format(frame_number, length))
+		for (top, right, bottom, left), name in zip(face_locations, face_names):
+			if not name:
+				continue
+			cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-		for number in range(len(numbering)):
-		#print(names[number], numbering[number])
-			if numbering[number] > 100:
-				user = User.objects.get(username=names[number])
-				new_post = attendance.objects.create(user=user, lecture_code=lect, result="ATTEND" )
-			else:
-				user = User.objects.get(username=names[number])
-				new_post = attendance.objects.create(user=user, lecture_code=lect, result="ABSENT" )
+		cv2.imshow('IP camera', frame)
+		print("Writing frame {} / {}".format(frame_number, limit_frame))
+		output_movie.write(frame)
+		print(numbering)
 
-
+	# for number in range(len(numbering)):
+	# #print(names[number], numbering[number])
+	# 	if numbering[number] > 100:
+	# 		user = User.objects.get(username=names[number])
+	# 		new_post = attendance.objects.create(username=user, lecture=lec1, result="{'09:00' : 'ATTEND'}" )
+			
 		
-	for determine_number in numbering:
-		if determine_number > 100:
-			#n = attendance.objects.create(User="20150001", Lecture_code="L001", Result='attend')
-			print('OK')
-
-
-		else:
-			print('Not OK')
-	
-
 	input_movie.release()
+	output_movie.release()
 	cv2.destroyAllWindows()
-	
+	return numbering

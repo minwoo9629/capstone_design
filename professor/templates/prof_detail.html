@@ -2,6 +2,7 @@
 {% block content%}
 {% load static %}
 <!-- <link href="style" href="{% static 'css/test.css' %}"> */ -->
+
 <br>
 <style>
     .row {
@@ -18,7 +19,7 @@
 <div class="container">
     <div class='row'>
         <div class="col" id="check" style="border-right:1px solid black;">
-            <form method="POST" >
+            <form method="POST">
                 {% csrf_token %}
                 <p>출결 로그 조회</p>
                 {{form}}
@@ -53,13 +54,19 @@
     <tbody>
         
         {%for attend in attends%}
+       
         <tr>
             <td>{{attend.id}}</td>
             <td>{{attend.username}}</td>
-            <td>{{attend.result}}</td>
-        </tr>
+            <td> 
+                <script type=text/javascript>
+                    a = "{{ attend.result }}".replace(/&#x27;/g, "\"");
+                    var a_parse = JSON.parse(a)
+                   
+                </script></td>
         {%endfor%}
-
+      
+        </tr>
     </tbody>
 </table>
 {% endblock %}
