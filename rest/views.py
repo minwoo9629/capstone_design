@@ -75,7 +75,7 @@ class UserLectureData(APIView):
 class LectureData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self, request):
+    def POST(self, request, *args, **kwargs):
         username = request.user.get_username()
         lecture_id = request.data['lecture_id']
         lecture = Lecture.objects.get(id=lecture_id)
