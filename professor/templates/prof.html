@@ -1,5 +1,19 @@
 {% extends 'base.html'%}
-{% block content %}
+{% block content%}
+{% load static %}
+<!-- <link href="style" href="{% static 'css/test.css' %}"> */ -->
 <br>
-<button type="button" class="btn btn-outline-dark">금주 출석 조회</button>
+<style>
+    .row{
+        border:3px solid black;
+        
+    }
+    .col{
+        box-sizing: border-box;
+        
+        margin: 15px;
+    }
+</style>
+
+<br>
 {% endblock %}

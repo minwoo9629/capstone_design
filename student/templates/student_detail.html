@@ -1,30 +1,70 @@
 {% extends 'base.html'%}
 {% block content %}
 
+<style>
+    .row {
+        border: 3px solid black;
+
+    }
+
+    .col {
+        box-sizing: border-box;
+
+        margin: 15px;
+    }
+</style>
+
 <br>
+
+<div class="container">
+    <div class='row'>
+        <div class="col" id="check" style="border-right:1px solid black;">
+            <form method="POST">
+                {% csrf_token %}
+                <p>출결 로그 조회</p>
+                {{form}}
+                <button type='submit' class="btn btn-outline-primary">선택</button>
+
+                <p id='test'> </p>
+            </form>
+        </div>
+        <div class="col" id="time">
+            안녕
+        </div>
+    </div>
+</div>
+
+<br>
+
 <div class="container">
     <table class="table table-striped">
-        <thead>
+        <thead>    
             <tr>
                 <th>번호</th>
                 <th>학번</th>
-                <th>출석일자</th>
-                {% for attend in posts %}
+                <th>출석 일자</th>
                 <script type="text/javascript">
-                    var k1 = "{{attend.result}}";
-                    var k2 = k1.replace(/&#39;/g, "\"");
-                    var k3 = JSON.parse(k2);
-                    var num = Object.keys(k3).length;
-                    document.write(num + "<br>");
-                    for(key in k3) {
-                        document.write('key:' + key + ' / ' + 'value:' + k3[key] + "<br>");
-                    }              
-                    document.write("<p>안녕하세요</p>");
+                var k1 = "{{posts.0.result}}";
+                document.write(k1);
+                var k2 = k1.replace(/&quot;/g, "\"");
+                var k3 = JSON.parse(k2); 
+                var num = 1;
+                for(key in k3) {
+                    document.write("<th>" + num++ + "차 출석" + "</th>");
+                    }
                 </script>
-                <th></th>
-                {%endfor%}
-                
+
+                <script type="text/javascript">
+                    var k1 = "{{attends.result}}";
+                    var k2 = k1.replace(/&quot;/g, "\"");
+                    var k3 = JSON.parse(k2); 
+                    var num = 1;
+                    for(key in k3) {
+                        document.write("<th>" + num++ + "차 출석"+"</th>");
+                        }
+                </script>
             </tr>
+            
         </thead>
         <tbody>
             {% for attend in posts %}
@@ -32,17 +72,49 @@
                 <td>{{attend.id}}</td>
                 <td>{{attend.username}}</td>
                 <td>{{attend.time}}</td>
-                <!-- <script type="text/javascript">
-                    var k1 = "{{attend.result}}";
-                    var k2 = k1.replace(/&#39;/g, "\"");
-                    var k3 = JSON.parse(k2);                    
-                    for(key in k3) {
-                        document.write('key:' + key + ' / ' + 'value:' + k3[key] + "<br>");
-                        }
-                </script> -->
-                <td id="result"></td>
+                <script type="text/javascript">
+                var k1 = "{{attend.result}}";
+                var k2 = k1.replace(/&quot;/g, "\"");
+                var k3 = JSON.parse(k2); 
+                for(key in k3) {
+                    switch(k3[key]){
+                        case "ATTEND":
+                        document.write("<td>"+"출석"+"</td>");
+                        break;
+                        case "LATE":
+                        document.write("<td>"+"지각"+"</td>");
+                        break;
+                        case "ABSENT":
+                        document.write("<td>"+"결석"+"</td>");
+                        break;
+                    }
+                }
+                </script>
             </tr>
             {%endfor%}
+            <tr>
+                <td>{{attends.id}}</td>
+                <td>{{attends.username}}</td>
+                <td>{{attends.time}}</td>
+                <script type="text/javascript">
+                    var k1 = "{{attends.result}}";
+                    var k2 = k1.replace(/&quot;/g, "\"");
+                    var k3 = JSON.parse(k2); 
+                    for(key in k3) {
+                        switch(k3[key]){
+                            case "ATTEND":
+                            document.write("<td>"+"출석"+"</td>");
+                            break;
+                            case "LATE":
+                            document.write("<td>"+"지각"+"</td>");
+                            break;
+                            case "ABSENT":
+                            document.write("<td>"+"결석"+"</td>");
+                            break;
+                        }
+                    }
+                </script>
+            </tr>
         </tbody>
     </table>
     <hr>
