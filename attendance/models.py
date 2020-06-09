@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User,Group
 from lecture.models import Lecture
-from django_mysql.models import JSONField, Model
+import jsonfield
 # Create your models here.
 
 class attendance(models.Model):
@@ -9,4 +9,4 @@ class attendance(models.Model):
     username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="user", limit_choices_to={'groups__name': "student"})
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
-    result = JSONField()
+    result = jsonfield.JSONField()
