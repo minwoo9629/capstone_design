@@ -46,9 +46,9 @@ class UserLectureData(APIView):
 
         # 금일 학생의 수강 과목
         student = Student.objects.get(username=username)
-        today_student_lectures = student.take_lectures.filter(day_of_the_week=today)
+        lecture_list = student.take_lectures.filter(day_of_the_week=today)
         # 현재 시간에 따른 수강해야할 강의 목록
-        lecture_list = today_student_lectures.filter(end_time__gte="14:00")
+        # lecture_list = today_student_lectures.filter(end_time__gte="14:00")
         
         def get_lecture(lecture_list):
             sequence = []
@@ -75,7 +75,7 @@ class UserLectureData(APIView):
 class LectureData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    def POST(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         username = request.user.get_username()
         lecture_id = request.data['lecture_id']
         lecture = Lecture.objects.get(id=lecture_id)
@@ -103,8 +103,9 @@ class AttendData(APIView):
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
         # 요청 받은 출석 결과
         result_data = request.data['result']
+        lecture_id = request.data['lecture']
         try:
-            attend = attendance.objects.filter(time=ymd).get(username=username)
+            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
 
             # 기존의 출석 결과 str->dict
             attend_result = json.loads(attend.result)

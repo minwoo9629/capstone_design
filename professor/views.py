@@ -82,7 +82,7 @@ def detail(request, lecture_id):
         lecture_list = GiveLectures.objects.filter(username=username)
         lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
 
-        return render(request, 'prof_detail.html', {'lecture_list':lecture_list, 'lecture_detail':lecture_detail, 'form':form})    
+        return render(request, 'prof_detail.html', {'lecture_list':lecture_list, 'lecture_detail':lecture_detail, 'form':form,'group':group_value[0]["name"]})    
 
 
 
