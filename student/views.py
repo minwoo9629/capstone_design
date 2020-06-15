@@ -66,7 +66,7 @@ def detail(request, lecture_id):
             lecture_list = TakeLectures.objects.filter(username=username)
             lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
             try:
-                lecture_in_date = attendance.objects.filter(lecture=lecture_detail).filter(time=date_obj)
+                lecture_in_date = attendance.objects.filter(username=username).filter(lecture=lecture_detail).filter(time=date_obj)
             except ObjectDoesNotExist:
                 lecture_in_date = None
 
