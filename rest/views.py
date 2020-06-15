@@ -53,11 +53,11 @@ class UserLectureData(APIView):
         def get_lecture(lecture_list):
             sequence = []
             lecture_id = []
-            b = lecture_list.order_by('start_time')
-            for num in range(len(b)):
+            order_lecture_list = lecture_list.order_by('start_time')
+            for num in range(len(order_lecture_list)):
                 sequence.append(num+1)
 
-            for lecture in lecture_list:
+            for lecture in order_lecture_list:
                 lecture_id.append(lecture.id)
             
             lecture_data = dict(zip(sequence,lecture_id))

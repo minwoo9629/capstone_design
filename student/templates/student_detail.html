@@ -52,16 +52,7 @@
                     document.write("<th>" + num++ + "차 출석" + "</th>");
                     }
                 </script>
-
-                <script type="text/javascript">
-                    var k1 = "{{attends.result}}";
-                    var k2 = k1.replace(/&quot;/g, "\"");
-                    var k3 = JSON.parse(k2); 
-                    var num = 1;
-                    for(key in k3) {
-                        document.write("<th>" + num++ + "차 출석"+"</th>");
-                        }
-                </script>
+                <th>출석 결과</th>
             </tr>
             
         </thead>
@@ -89,31 +80,9 @@
                     }
                 }
                 </script>
+                <td>{{attend.final_result}}</td>
             </tr>
             {%endfor%}
-            <tr>
-                <td>{{attends.id}}</td>
-                <td>{{attends.username}}</td>
-                <td>{{attends.time}}</td>
-                <script type="text/javascript">
-                    var k1 = "{{attends.result}}";
-                    var k2 = k1.replace(/&quot;/g, "\"");
-                    var k3 = JSON.parse(k2); 
-                    for(key in k3) {
-                        switch(k3[key]){
-                            case "ATTEND":
-                            document.write("<td>"+"출석"+"</td>");
-                            break;
-                            case "LATE":
-                            document.write("<td>"+"지각"+"</td>");
-                            break;
-                            case "ABSENT":
-                            document.write("<td>"+"결석"+"</td>");
-                            break;
-                        }
-                    }
-                </script>
-            </tr>
         </tbody>
     </table>
     <hr>

@@ -66,10 +66,10 @@ def detail(request, lecture_id):
             lecture_list = TakeLectures.objects.filter(username=username)
             lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
             try:
-                lecture_in_date = attendance.objects.filter(lecture=lecture_detail).get(time=date_obj)
+                lecture_in_date = attendance.objects.filter(lecture=lecture_detail).filter(time=date_obj)
             except ObjectDoesNotExist:
                 lecture_in_date = None
 
-        context = {'lecture_list':lecture_list, 'group':group_value[0]["name"],'form':form, 'attends':lecture_in_date}
+        context = {'lecture_list':lecture_list, 'group':group_value[0]["name"],'form':form, 'posts':lecture_in_date}
         return render(request,'student_detail.html', context)
 
