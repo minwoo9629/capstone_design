@@ -6,7 +6,15 @@ import jsonfield
 
 class attendance(models.Model):
     ResultChoice = [('ATTEND','출석'),('LATE','지각'),('ABSENT','결석')]
-    username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="user", limit_choices_to={'groups__name': "student"})
+    username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="username", limit_choices_to={'groups__name': "student"})
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
     result = jsonfield.JSONField()
+
+
+class userlog(models.Model):
+    username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="username", limit_choices_to={'groups__name': "student"})
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    check = models.CharField(verbose_name="in/out", max_length=5)
+    

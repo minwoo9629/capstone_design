@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from student.models import Student
-from attendance.models import attendance
+from attendance.models import attendance, userlog
 
 class UserLectureSerializer(serializers.Serializer):
         username = serializers.CharField(max_length=10)
@@ -21,3 +21,10 @@ class AttendSerializer(serializers.Serializer):
         class Meta:
                 model = attendance
                 field = '__all__'
+
+class LogSerializer(serializers.ModelSerializer):
+        class Meta:
+                model = userlog
+                field = '__all__'
+
+        
