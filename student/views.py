@@ -10,48 +10,6 @@ from datetime import datetime
 from time import strftime
 from django.core.exceptions import ObjectDoesNotExist
 
-
-# 임시적 import
-from attendance.models import facial_attendance
-import time, json
-# 최종 출결 결과를 출력하기 위한 함수
-# 예시 lecture_id = 57 username = 20151956
-# ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
-# def final_result_function(lecture_id, username):
-#     attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
-#     facial_attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
-    
-#     attend_list = []
-#     facial_attend_list = []
-#     final_result_list = []
-
-#     dict_attend = {}
-#     dict_facial_attend = {}
-#     dict_attend = json.loads(attend.result)
-#     dict_facial_attend = json.loads(facial_attend.result)
-    
-#     for key in dict_attend.keys():
-#         attend_list.append(dict_attend[key])
-
-#     for key in dict_facial_attend.keys():
-#         facial_attend_list.append(dict_facial_attend[key])
-
-#     for i,j in zip(attend_list,facial_attend_list):
-#         if i == j:
-#             final_result_list.append(i)
-#         else:
-#             final_result_list.append("ABSENT")
-
-#     if len(list(set(final_result_list))) == 2:
-#         attend.final_result = "지각"
-    
-#     else:
-#         if list(set(final_result_list))[0] == "ATTEND":
-#             attend.final_result = "출석"
-#         else:
-#             attend.final_result = "결석"
-#     attend.save()
-
 def student(request):
     # 현재 접속 중인 학생의 학번 추출
     username = request.user.get_username()

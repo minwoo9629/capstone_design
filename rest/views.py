@@ -13,8 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
-import datetime, time
-import json
+import datetime, time, json
 from django.core.exceptions import ObjectDoesNotExist
 
 def final_result_function(lecture_id, username,ymd):
