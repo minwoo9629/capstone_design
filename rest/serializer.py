@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from student.models import Student
-from attendance.models import attendance
+from attendance.models import attendance, facial_attendance
 
 class LectureSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=20)
@@ -19,4 +19,9 @@ class MessageSerializer(serializers.Serializer):
 class AttendSerializer(serializers.ModelSerializer):
         class Meta:
                 model = attendance
+                fields = '__all__'
+
+class Facial_AttendSerializer(serializers.ModelSerializer):
+        class Meta:
+                model = facial_attendance
                 fields = '__all__'
