@@ -50,22 +50,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">학번</th>
-
-                
-
-                <script type=text/javascript>
-                    a = ("{{ attends.0.result }}").replace(/&quot;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    //var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<th>' + key + "</th>");
-                    }  
-                    </script>
-
-                
+                <th scope="col">출결 결과</th>                
             </tr>
         </thead>
 
@@ -76,19 +61,21 @@
             <tr>
                 <td>{{attend.id}}</td>
                 <td>{{attend.username}}</td>
-                
-                    <script type=text/javascript>
-                    a = ("{{ attend.result }}").replace(/&quot;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<td>' + a_parse[key] + '</td>');
-                    }  
-                </script>
-                
+                <script>
+                    var final_result = "{{attend.final_result}}"
+                    if(final_result == "처리중"){
+                        document.write("<td>"+final_result+"</td>");
+                    }
+                    else if(final_result == "출석"){
+                        document.write("<td>"+"&#9711;"+"</td>");
+                    }
+                    else if(final_result == "지각"){
+                        document.write("<td>"+"&#9651;"+"</td>");
+                    }
+                    else{
+                        document.write("<td>"+"&#10006;"+"</td>");
+                    }
+                </script>              
                 {%endfor%}
 
             </tr>

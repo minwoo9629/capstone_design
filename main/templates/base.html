@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Simple Sidebar - Start Bootstrap Template</title>
+    <title>전자 출결 시스템</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{%static 'index/vendor/bootstrap/css/bootstrap.min.css'%}" rel="stylesheet">
@@ -57,8 +57,11 @@
                     <!-- <ul class="navbar-nav ml-auto mt-2 mt-lg-0"> -->
                     <ul class="nav nav-tabs ml-auto mt-2 mt-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link active" href="{%url 'prof'%}">Home <span
-                                    class="sr-only">(current)</span></a>
+                            {% if group == "student" %}
+                            <a class="nav-link active" href="{%url 'student'%}">Home <span class="sr-only">(current)</span></a>
+                            {% elif group == "professor" %}
+                            <a class="nav-link active" href="{%url 'prof'%}">Home <span class="sr-only">(current)</span></a>
+                            {%endif%}
                         </li>
                         <li class="nav-item">
                             <a class="nav-link disabled" style="color: black;">{{user.username}} 로그인 중</a>
