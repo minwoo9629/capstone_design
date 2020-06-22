@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from student.models import Student, TakeLectures
 from lecture.models import Lecture, Room, Beacon
 from attendance.models import attendance, facial_attendance
-from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer
+from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
 from rest_framework.authtoken.models import Token
@@ -215,3 +215,26 @@ class UserPostViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
+
+
+class FinalResultData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        username = request.user.get_username()
+        ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        lecture_id = request.data['lecture']
+        lecture = Lecture.objects.get(id=lecture_id)
+        try:
+            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+            if attend.final_result == "출석":
+                final_attend = "○"
+            elif attend.final_result == "지각":
+                final_attend = "△"
+            else:
+                final_attend = "X"
+            data = {'username':username, 'lecture':lecture.name, 'final_attend':final_attend}
+            serializer_class = FinalResultSerializer(data)
+            return Response(serializer_class.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

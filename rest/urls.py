@@ -13,4 +13,5 @@ urlpatterns = [
     path('attend/', views.AttendData.as_view()),
     path('facial_attend/', views.Facial_AttendData.as_view()),
     path('lecture/', views.LectureData.as_view()),
+    path('final_result/', views.FinalResultData.as_view()),
 ]

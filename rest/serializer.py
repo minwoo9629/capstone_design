@@ -25,3 +25,10 @@ class Facial_AttendSerializer(serializers.ModelSerializer):
         class Meta:
                 model = facial_attendance
                 fields = '__all__'
+
+class FinalResultSerializer(serializers.Serializer):
+        username = serializers.CharField(max_length=10)
+        lecture = serializers.CharField(max_length=30)
+        final_attend = serializers.CharField(max_length=10)
+
+
