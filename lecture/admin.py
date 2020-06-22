@@ -5,7 +5,7 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = ['code', 'building', 'number']
 
 class LectureAdmin(admin.ModelAdmin):
-    list_display = ['name','code', 'split_code','room_code', 'semester','day_of_the_week','start_time','end_time']
+    list_display = ['id','name','code', 'split_code','room_code', 'semester','day_of_the_week','start_time','end_time']
 
 class BeaconAdmin(admin.ModelAdmin):
     list_display = ['room_code','major','minor']

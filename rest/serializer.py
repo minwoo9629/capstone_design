@@ -20,11 +20,11 @@ class MessageSerializer(serializers.Serializer):
 class AttendSerializer(serializers.Serializer):
         class Meta:
                 model = attendance
-                field = '__all__'
+                fields = '__all__'
 
 class LogSerializer(serializers.ModelSerializer):
         class Meta:
                 model = userlog
-                field = '__all__'
+                fields = '__all__'
 
         

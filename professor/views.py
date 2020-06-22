@@ -57,7 +57,7 @@ def detail(request, lecture_id):
             # 게시판 객체 num 개를 한 페이지로 자른다.
             attend_page = request.GET.get('page')
             # request된 페이지를 변수에 담는다.
-            posts = paginator.get_page(attend_page)
+            attends = paginator.get_page(attend_page)
             # request된 페이지를 얻어온 뒤 post에 저장
 
             page_numbers_range = 5
@@ -71,7 +71,7 @@ def detail(request, lecture_id):
                 end_index = max_index
 
             page_range = paginator.page_range[start_index:end_index]
-        return render(request, 'prof_detail.html', {'attends': posts, 'lecture_list': lecture_list, 'lecture_detail':lecture_detail, 'form':form, 'page_range':page_range})
+        return render(request, 'prof_detail.html', {'attends': attends, 'lecture_list': lecture_list, 'lecture_detail':lecture_detail, 'form':form, 'page_range':page_range})
 
     elif request.method == 'GET': #과목 누를 때
             

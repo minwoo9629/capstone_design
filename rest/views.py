@@ -90,7 +90,6 @@ class AttendData(APIView):
             g = json.dumps(f)
             
             e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': g}
-            hi = "hi"
             serializer = AttendSerializer(attend, data=e)
             # 직접 유효성 검사
             if serializer.is_valid():
@@ -131,7 +130,7 @@ class UserLogData(APIView):
 
         result = {'username':username, 'time': time, 'check':check, 'lecture':lecture}
         serializer = LogSerializer(data=result)
-        if serializer.is_valid:
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

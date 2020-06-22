@@ -48,23 +48,9 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">학번</th>
-
-                
-
-                <script type=text/javascript>
-                    a = ("{{ attends.0.result }}").replace(/&#x27;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    //var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<th>' + key + "</th>");
-                    }  
-                    </script>
-
+                <th >#</th>
+                <th >학번</th>
+                <th >출석 결과</th> 
                 
             </tr>
         </thead>
@@ -78,20 +64,24 @@
                 <td>{{attend.username}}</td>
                 
                     <script type=text/javascript>
-                    a = ("{{ attend.result }}").replace(/&#x27;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<td>' + a_parse[key] + '</td>');
-                    }  
+                    var result = "{{attend.final_result}}"
+                    if (result == "처리중"){
+                        document.write("<td>" + result + "<a href='detail' onclick='window.open(this.href, '_blank', 'width=150, height=150, toolbar=no')' style='float: right';>" + "상세 출결 결과 확인" + "</a>" + "</td>" );   
+                    }
+                    else if (result == "출석") {
+                        document.write("<td>" + "&#9711;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" +"</td>");
+                    }
+                    else if (result == "지각") {
+                        document.write("<td>" + "&#9651;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" +"</td>");
+                    }
+                    else {
+                        document.write("<td>" + "&#10006;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
+                    }
                 </script>
-                
+            </tr>
                 {%endfor%}
 
-            </tr>
+           
         </tbody>
     </table>
     <hr>
