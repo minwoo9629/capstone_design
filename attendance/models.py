@@ -20,3 +20,9 @@ class facial_attendance(models.Model):
     time = models.DateField(auto_now_add=True)
     result = jsonfield.JSONField()
     final_result = models.CharField(max_length=10, default="처리중")
+
+class userlog(models.Model):
+    username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="username", limit_choices_to={'groups__name': "student"})
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
+    time = models.DateTimeField()
+    check = models.CharField(verbose_name="in/out", max_length=5)

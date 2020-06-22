@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from student.models import Student, TakeLectures
 from lecture.models import Lecture, Room, Beacon
 from attendance.models import attendance, facial_attendance
-from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer
+from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer, LogSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
 from rest_framework.authtoken.models import Token
@@ -238,3 +238,26 @@ class FinalResultData(APIView):
             return Response(serializer_class.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserLogData(APIView): 
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.get_username()
+        log = userlog.objects.filter(username=username)
+        serializer_class = LogSerializer(log, many=True)
+        return Response(serializer_class.data)
+
+    def post(self, request):
+        username = request.user.get_username()
+        time = request.data['time'] #request time
+        check = request.data['check'] # in/out
+        lecture = request.data['lecture'] #lecture id
+
+        result = {'username':username, 'time': time, 'check':check, 'lecture':lecture}
+        serializer = LogSerializer(data=result)
+        if serializer.is_valid:
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
