@@ -1,0 +1,65 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'index/vendor/bootstrap/css/bootstrap.min.css'%}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{%static 'index/css/simple-sidebar.css'%}" rel="stylesheet">
+</head>
+
+<body>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col"></th>
+                <script>
+                    var count = "{{count}}"
+                    for (var i = 1; i <= count; i++) {
+                        document.write("<th scope='col'>" + i + "차 출석" + "</th>");
+
+                    }
+                </script>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">비콘</th>
+                {%for attend in attend %}
+                <script>
+                    attend = "{{attend}}"
+                    if (attend == "ATTEND") {
+                        document.write("<td>" + "&#9711;" + "</td>");
+                    }
+                    else {
+                        document.write("<td>" + "&#10006;" + "</td>");
+                    }
+                </script>
+                {%endfor%}
+            </tr>
+            <tr>
+                <th scope="row">얼굴인식</th>
+                {%for facial_attend in facial_attend %}
+                <script>
+                    facial_attend = "{{facial_attend}}"
+                    if (facial_attend == "ATTEND") {
+                        document.write("<td>" + "&#9711;" + "</td>");
+                    }
+                    else {
+                        document.write("<td>" + "&#10006;" + "</td>");
+                    }
+                </script>
+                {%endfor%}
+            </tr>
+        </tbody>
+    </table>
+    <script src="{%static 'index/vendor/jquery/jquery.min.js'%}"></script>
+    <script src="{%static 'index/vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+</body>
+
+</html>

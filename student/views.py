@@ -29,6 +29,7 @@ def detail(request, lecture_id):
         lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
         username = request.user.username
         group_value = request.user.groups.values()
+        lecture = Lecture.objects.get(id=lecture_id)
         lecture_list = TakeLectures.objects.filter(username=username)
         form = FindDateForm()
         attend_list = attendance.objects.filter(lecture=lecture_id).filter(username=username).order_by('-id')
@@ -52,7 +53,7 @@ def detail(request, lecture_id):
             page_range = paginator.page_range[start_index:end_index]
         
         # final_result_function(lecture_id,username)
-        context = {'lecture_list':lecture_list, 'group':group_value[0]["name"], 'posts':posts,'page_range':page_range,'attend_list':attend_list, 'form':form}
+        context = {'lecture_list':lecture_list, 'lecture':lecture,'group':group_value[0]["name"], 'posts':posts,'page_range':page_range,'attend_list':attend_list, 'form':form}
         # context = {'lecture_list':lecture_list, 'group':group_value[0]["name"], 'posts':posts,'page_range':page_range,'attend_list':attend_list, 'form':form}
         return render(request,'student_detail.html', context)
 

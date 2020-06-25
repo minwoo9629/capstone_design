@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from student.models import Student, TakeLectures
 from lecture.models import Lecture, Room, Beacon
-from attendance.models import attendance, facial_attendance
+from attendance.models import attendance, facial_attendance, userlog
 from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer, LogSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
