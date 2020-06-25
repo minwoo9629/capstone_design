@@ -220,7 +220,7 @@ class UserPostViewSet(viewsets.ModelViewSet):
 class FinalResultData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    def get(self, request):
+    def post(self, request):
         username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
         lecture_id = request.data['lecture']
