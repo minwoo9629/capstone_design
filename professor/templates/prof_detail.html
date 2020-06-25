@@ -44,13 +44,14 @@
         </div>
     </div>
 </div>
-<div class="container">
+<div class="container" style = "padding: 0%; text-align: center;">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">학번</th>
-                <th scope="col">출결 결과</th>                
+                <th scope="col">출결 결과</th>
+                <th></th>
             </tr>
         </thead>
 
@@ -59,26 +60,29 @@
             {%for attend in attends%}
 
             <tr>
-                <td>{{attend.id}}</td>
-                <td>{{attend.username}}</td>
-                <script>
-                    var final_result = "{{attend.final_result}}"
-                    if(final_result == "처리중"){
-                        document.write("<td>"+final_result+"</td>");
+                <script type=text/javascript>
+                    var increase = 1;
+                    document.write("<td>" + increase++ + "</td>")
+                    document.write("<td>" + {{attend.username.username}} + "</td>");
+
+                    var result = "{{attend.final_result}}"
+                    if(result == "처리중"){
+                        document.write("<td>"+result+"</td>");
                     }
-                    else if(final_result == "출석"){
+                    else if(result == "출석"){
                         document.write("<td>"+"&#9711;"+"</td>");
                     }
-                    else if(final_result == "지각"){
+                    else if(result == "지각"){
                         document.write("<td>"+"&#9651;"+"</td>");
                     }
                     else{
                         document.write("<td>"+"&#10006;"+"</td>");
                     }
-                </script>              
-                {%endfor%}
-
+                </script>
+                
+                <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}" onclick='window.open(this.href, "test","width=1030, height=600"); return false;'>  상세 출결 결과 확인 </a></td>
             </tr>
+            {%endfor%}         
         </tbody>
     </table>
     <hr>

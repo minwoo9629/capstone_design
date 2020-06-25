@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Count
 from lecture.models import GiveLectures, Lecture
 from .models import Professor
-from attendance.models import attendance
+from attendance.models import attendance,  facial_attendance
 from datetime import datetime
 from .forms import FindDateForm
 import json
@@ -28,11 +28,6 @@ def logout(request):
         return redirect('main')
     return render(request, 'main.html')
 
-# def detail(request, lecture_id):
-#     lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
-#     attend = attendance.objects.filter(lecture=lecture_id)
-#     return render(request, 'prof_detail.html',{'lecture_detail':lecture_detail, 'attend':attend})
-
 def detail(request, lecture_id):
     username = request.user.get_username()
     group_value = request.user.groups.values()
@@ -48,11 +43,12 @@ def detail(request, lecture_id):
             
             date = (form.data['find_date'])
             date_obj = datetime.strptime(date, '%Y-%m-%d')
+            date_obj = datetime.date(date_obj)
 
             lecture_list = GiveLectures.objects.filter(username=username)
             lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
             lecture_in_date = attendance.objects.filter(
-            lecture=lecture_detail).filter(time=date_obj)
+            lecture=lecture_detail).filter(time=date_obj).order_by('id')
 
             # 해당 수업의 출석들에 대해서 pagination 진행
             num = 5
@@ -60,7 +56,7 @@ def detail(request, lecture_id):
             # 게시판 객체 num 개를 한 페이지로 자른다.
             attend_page = request.GET.get('page')
             # request된 페이지를 변수에 담는다.
-            posts = paginator.get_page(attend_page)
+            attends = paginator.get_page(attend_page)
             # request된 페이지를 얻어온 뒤 post에 저장
 
             page_numbers_range = 5
@@ -74,7 +70,7 @@ def detail(request, lecture_id):
                 end_index = max_index
 
             page_range = paginator.page_range[start_index:end_index]
-        return render(request, 'prof_detail.html', {'attends': posts, 'lecture_list': lecture_list, 'lecture_detail':lecture_detail, 'form':form, 'page_range':page_range,'group':group_value[0]["name"]})
+        return render(request, 'prof_detail.html', {'attends': attends, 'lecture_list': lecture_list, 'lecture_detail':lecture_detail, 'form':form, 'page_range':page_range,'date':date_obj,'group':group_value[0]["name"]})
 
     elif request.method == 'GET': #과목 누를 때
             
@@ -82,7 +78,28 @@ def detail(request, lecture_id):
         lecture_list = GiveLectures.objects.filter(username=username)
         lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
 
-        return render(request, 'prof_detail.html', {'lecture_list':lecture_list, 'lecture_detail':lecture_detail, 'form':form,'group':group_value[0]["name"]})    
+        return render(request, 'prof_detail.html', {'lecture_list':lecture_list, 'lecture_detail':lecture_detail, 'form':form,'group':group_value[0]["name"]})
+
+def show_detail(request, lecture_id, username, date): #student_id : 학번
+    this_lecture = get_object_or_404(Lecture, pk=lecture_id)
+    attend = attendance.objects.filter(lecture=this_lecture).filter(time=date).get(username=username)
+    facial_attend = facial_attendance.objects.filter(lecture=this_lecture).filter(time=date).get(username=username)
+
+    return render(request, 'prof_check.html', {'attend':attend, 'facial_attend' : facial_attend})
+
+def change_date(request):
+    username = request.user.get_username()
+    lecture_list = GiveLectures.objects.filter(username=username)
+
+    lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
+    attends = attendance.objects.filter(lecture=lecture_detail)
+
+    if request.method == 'POST':
+        form = FindDateForm(request.POST)
+        if form.is_valid():
+            date = form.data('find_date')
+
+    return render(request, 'prof_check.html', {'attends': attends, 'lecture_list': lecture_list, 'lecture_detail':lecture_detail, 'form':form, 'date':date})
 
 
 

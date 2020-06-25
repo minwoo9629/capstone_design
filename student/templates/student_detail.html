@@ -47,7 +47,7 @@
                 <th>학번</th>
                 <th>출석 일자</th>
                 <th>출석 결과</th>
-                <!-- <th></th> -->
+                <th></th>
             </tr>
 
         </thead>
@@ -58,31 +58,25 @@
                 <td>{{attend.username}}</td>
                 <td>{{attend.time}}</td>
                 <script>
-                    // function func() {
-                    //     url = "{%url 'attend_detail' attend.time%}"
-                    //     var popupX = (window.screen.width/2) - (600 / 2);
-                    //     var popupY = (window.screen.height/2) - (250 / 2);
-                    //     window.open(url, '_blank', 'width=600, height=250, left='+ popupX + ', top='+ popupY);
-                        
-                    // }
                     var final_result = "{{attend.final_result}}"
                     if (final_result == "처리중") {
                         document.write("<td>" + final_result + "</td>");
                     }
                     else if (final_result == "출석") {
                         // document.write("<td>" + "&#9711;" + "<a href='' onclick='func()' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#9711;" + "<a href='{% url 'attend_detail' attend.time %}' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
+                        document.write("<td>" + "&#9711;"+ "</td>");
 
                     }
                     else if (final_result == "지각") {
                         // document.write("<td>" + "&#9651;" + "<a href='' onclick='func()' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#9651;" + "<a href='{% url 'attend_detail' attend.time %}'style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
+                        document.write("<td>" + "&#9651;"+ "</td>");
                     }
                     else {
                         // document.write("<td>" + "&#10006;" + "<a href='' onclick='func(attend_time)' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#10006;" + "<a href='{% url 'attend_detail' attend.time %}'style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
+                        document.write("<td>" + "&#10006;"+ "</td>");
                     }
                 </script>
+                <td><a href='{% url 'attend_detail' attend.lecture.id attend.time %}' onclick="window.open(this.href,'_blanck', 'width=600,height=250');return false;" style='float: right;'>상세 출결 결과 확인</a></td>
             </tr>
             {%endfor%}
         </tbody>

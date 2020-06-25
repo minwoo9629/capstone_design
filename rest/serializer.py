@@ -34,6 +34,6 @@ class FinalResultSerializer(serializers.Serializer):
 class LogSerializer(serializers.ModelSerializer):
         class Meta:
                 model = userlog
-                field = '__all__'
+                fields = '__all__'
 
 

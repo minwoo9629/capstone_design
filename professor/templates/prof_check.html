@@ -1,0 +1,93 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Sidebar - Start Bootstrap Template</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{%static 'index/vendor/bootstrap/css/bootstrap.min.css'%}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{%static 'index/css/simple-sidebar.css'%}" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <table class="table" style="border-bottom: 1px solid #E6E6E6;">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">구분</th>
+                    <script type=text/javascript>
+                    a = ("{{ attend.result }}").replace(/&quot;/g, "\"");
+                    //document.write(a)
+                    var a_parse = JSON.parse(a)
+                    //document.write(a_parse)
+                    //var num = Object.keys(a_parse).length;
+                    for(key in a_parse) {
+                        document.write('<th>' + key + "</th>");
+                    }  
+                    </script>
+
+
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td scope="row">비콘 인식</td>
+                    <script type=text/javascript>
+                    attend = ("{{ attend.result }}").replace(/&quot;/g, "\"");
+                    
+                    //document.write(a)
+                    var attend_parse = JSON.parse(attend);
+                   
+                    //document.write(a_parse)
+
+                    for(key in attend_parse) {
+                        if (attend_parse[key] == "ATTEND") {
+                            document.write("<td>" + "&#9711;" + "</td>");
+                        }
+                        else if (attend_parse[key] == "LATE") {
+                            document.write("<td>" + "&#9651;"+ "</td>" );
+                        }
+                        else {
+                            document.write("<td>" + "&#10006;"+ "</td>");
+                        }
+                        
+                    }  
+                    
+                </script>
+
+                </tr>
+                <tr>
+                    <td scope="row">얼굴인식</td>
+                    <script type=text/javascript>
+                    facial = ("{{facial_attend.result}}").replace(/&quot;/g, "\"");
+                    var facial_parse = JSON.parse(facial);
+
+                    for(key in facial_parse) {
+                        if (facial_parse[key] == "ATTEND") {
+                            document.write("<td>" + "&#9711;" + "</td>");
+                        }
+                        else if (facial_parse[key] == "LATE") {
+                            document.write("<td>" + "&#9651;"+ "</td>" );
+                        }
+                        else {
+                            document.write("<td>" + "&#10006;"+ "</td>");
+                        }
+                        
+                    } 
+                    </script>
+                </tr>
+            </tbody>
+        </table>
+        <script src="{%static 'index/vendor/jquery/jquery.min.js'%}"></script>
+        <script src="{%static 'index/vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+</body>
