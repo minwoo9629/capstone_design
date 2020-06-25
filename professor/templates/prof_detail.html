@@ -44,14 +44,14 @@
         </div>
     </div>
 </div>
-<div class="container">
+<div class="container" style = "padding: 0%; text-align: center;">
     <table class="table table-striped">
         <thead>
             <tr>
-                <th >#</th>
+                <th>#</th>
                 <th >학번</th>
                 <th >출석 결과</th> 
-                
+                <th>  </th>
             </tr>
         </thead>
 
@@ -60,28 +60,45 @@
             {%for attend in attends%}
 
             <tr>
-                <td>{{attend.id}}</td>
-                <td>{{attend.username}}</td>
                 
                     <script type=text/javascript>
-                    var result = "{{attend.final_result}}"
-                    if (result == "처리중"){
-                        document.write("<td>" + result + "<a href='detail' onclick='window.open(this.href, '_blank', 'width=150, height=150, toolbar=no')' style='float: right';>" + "상세 출결 결과 확인" + "</a>" + "</td>" );   
-                    }
-                    else if (result == "출석") {
-                        document.write("<td>" + "&#9711;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" +"</td>");
-                    }
-                    else if (result == "지각") {
-                        document.write("<td>" + "&#9651;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" +"</td>");
-                    }
-                    else {
-                        document.write("<td>" + "&#10006;"  + "<a href='#' style='float: right'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                    }
-                </script>
-            </tr>
+                        // function showPopup() {
+                            
+                        //     var popHeight = 600;
+                        //     var popWidth = 1030;
+                        //     var mtHeight = document.body.clientHeight;
+                        //     var mtWidth = document.body.clientWidth;
+                        //     var scX = window.screenLeft;
+                        //     var scY = window.screenTop;
+                        //     var popX = scX + (mtWidth - popWidth) /2 - 50;
+                        //     var popY = scY + (mtHeight - popHeight) /2 - 50;
+                        //     window.open(this.href, "test","width=popWidth, height=popHeight, left=popX, top=popY");
+                        // }
+                        var increase = 1;
+                        document.write("<td>" + increase++ + "</td>")
+                        document.write("<td>" + {{attend.username.username}} + "</td>");
+                        
+                        var result = "{{attend.final_result}}";
+                        if (result == "처리중"){
+                            document.write("<td>" + result  + "</td>");   
+                        }
+                        else if (result == "출석") {
+                            document.write("<td>" + "&#9711;" + "</td>");
+                        }
+                        else if (result == "지각") {
+                            document.write("<td>" + "&#9651;"+ "</td>" );
+                        }
+                        else {
+                            document.write("<td>" + "&#10006;"+ "</td>");
+                        }
+                    </script>
+
+                     <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}" onclick='window.open(this.href, "test","width=1030, height=600"); return false;'>  상세 출결 결과 확인 </a></td>
+                </tr>
                 {%endfor%}
 
-           
+  
+            </form>
         </tbody>
     </table>
     <hr>

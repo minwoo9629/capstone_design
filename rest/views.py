@@ -3,8 +3,8 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from student.models import Student
 from lecture.models import Lecture, Room, Beacon
-from attendance.models import attendance, userlog
-from .serializer import UserLectureSerializer,MessageSerializer, AttendSerializer, LogSerializer
+from attendance.models import attendance, userlog,facial_attendance
+from .serializer import UserLectureSerializer,MessageSerializer, AttendSerializer, LogSerializer, Facial_AttendSerializer, FinalResultSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +15,41 @@ import datetime, time
 import json
 from django.core.exceptions import ObjectDoesNotExist
 
+def final_result_function(lecture_id, username,ymd):
+    attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+    facial_attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+    
+    attend_list = []
+    facial_attend_list = []
+    final_result_list = []
+
+    dict_attend = {}
+    dict_facial_attend = {}
+    dict_attend = json.loads(attend.result)
+    dict_facial_attend = json.loads(facial_attend.result)
+    
+    for key in dict_attend.keys():
+        attend_list.append(dict_attend[key])
+
+    for key in dict_facial_attend.keys():
+        facial_attend_list.append(dict_facial_attend[key])
+
+    for i,j in zip(attend_list,facial_attend_list):
+        if i == j:
+            final_result_list.append(i)
+        else:
+            final_result_list.append("ABSENT")
+
+    if len(list(set(final_result_list))) == 2:
+        attend.final_result = "지각"
+    
+    else:
+        if list(set(final_result_list))[0] == "ATTEND":
+            attend.final_result = "출석"
+        else:
+            attend.final_result = "결석"
+    attend.save()
+    
 # 현재 날짜에 따른 요일 값 얻기
 day_of_week = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 today_num = datetime.datetime.today().weekday()
@@ -80,21 +115,28 @@ class AttendData(APIView):
     def post(self, request):
         username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        # 요청 받은 출석 결과
         result_data = request.data['result']
+        lecture_id = request.data['lecture']
         try:
-            attend = attendance.objects.filter(time=ymd).get(username=username)
-            attend_result = attend.result
-            d = json.loads(attend_result)
-            c = json.loads(result_data)
-            f = c.update(d)
-            g = json.dumps(f)
+            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+
+            # 기존의 출석 결과 str->dict
+            attend_result = json.loads(attend.result)
+
+            # 기존의 출석 결과 dict로 변경
+            result_data = json.loads(result_data)
+            attend_result.update(result_data)
+            result = json.dumps(attend_result)
             
-            e = {'username':attend.username, 'lecture':attend.lecture_id, 'result': g}
-            serializer = AttendSerializer(attend, data=e)
+            edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
+            serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
             if serializer.is_valid():
                 # 저장
-                serializer.save()       
+                serializer.save()
+                if request.data.get('end') is not None:
+                    final_result_function(lecture_id,username,ymd)    
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
@@ -105,12 +147,75 @@ class AttendData(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Facial_AttendData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        username = request.user.get_username()
+        attend = facial_attendance.objects.filter(username=username)
+        serializer_class = Facial_AttendSerializer(attend, many=True)
+        return Response(serializer_class.data)
+    
+    def post(self, request):
+        username = request.user.get_username()
+        ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        # 요청 받은 출석 결과
+        result_data = request.data['result']
+        lecture_id = request.data['lecture']
+        try:
+            attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+
+            # 기존의 출석 결과 str->dict
+            attend_result = json.loads(attend.result)
+
+            # 기존의 출석 결과 dict로 변경
+            result_data = json.loads(result_data)
+            attend_result.update(result_data)
+            result = json.dumps(attend_result)
+            
+            edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
+            serializer = Facial_AttendSerializer(attend, data = edit_data)
+            # 직접 유효성 검사
+            if serializer.is_valid():
+                # 저장
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except ObjectDoesNotExist:
+            serializer = Facial_AttendSerializer(data=request.data)
+            if serializer.is_valid():   # 직접 유효성 검사
+                serializer.save()       # 저장
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserPostViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
+
+class FinalResultData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        username = request.user.get_username()
+        ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        lecture_id = request.data['lecture']
+        lecture = Lecture.objects.get(id=lecture_id)
+        try:
+            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+            if attend.final_result == "출석":
+                final_attend = "○"
+            elif attend.final_result == "지각":
+                final_attend = "△"
+            else:
+                final_attend = "X"
+            data = {'username':username, 'lecture':lecture.name, 'final_attend':final_attend}
+            serializer_class = FinalResultSerializer(data)
+            return Response(serializer_class.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogData(APIView): 
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]

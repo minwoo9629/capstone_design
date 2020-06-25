@@ -11,5 +11,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('stdlect/', views.UserLectureData.as_view()),
     path('attend/', views.AttendData.as_view()),
+    path('facial_attend/', views.Facial_AttendData.as_view()),
     path('log/', views.UserLogData.as_view()),
 ]
