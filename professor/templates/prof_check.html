@@ -46,12 +46,21 @@
                     attend = ("{{ attend.result }}").replace(/&quot;/g, "\"");
                     
                     //document.write(a)
-                    var attend_parse = JSON.parse(attend)
+                    var attend_parse = JSON.parse(attend);
                    
                     //document.write(a_parse)
 
                     for(key in attend_parse) {
-                        document.write('<td>' + attend_parse[key] + '</td>');
+                        if (attend_parse[key] == "ATTEND") {
+                            document.write("<td>" + "&#9711;" + "</td>");
+                        }
+                        else if (attend_parse[key] == "LATE") {
+                            document.write("<td>" + "&#9651;"+ "</td>" );
+                        }
+                        else {
+                            document.write("<td>" + "&#10006;"+ "</td>");
+                        }
+                        
                     }  
                     
                 </script>
@@ -61,11 +70,21 @@
                 <td>얼굴인식</td>
                 <script type=text/javascript>
                     facial = ("{{facial_attend.result}}").replace(/&quot;/g, "\"");
-                    var facial_parse = JSON.parse(facial)
+                    var facial_parse = JSON.parse(facial);
+
                     for(key in facial_parse) {
-                        document.write('<td>' + facial_parse[key] + '</td>');
-                    }
-                </script>
+                        if (facial_parse[key] == "ATTEND") {
+                            document.write("<td>" + "&#9711;" + "</td>");
+                        }
+                        else if (facial_parse[key] == "LATE") {
+                            document.write("<td>" + "&#9651;"+ "</td>" );
+                        }
+                        else {
+                            document.write("<td>" + "&#10006;"+ "</td>");
+                        }
+                        
+                    } 
+                    </script>
                 </tr>
             </tbody>
         </table>
