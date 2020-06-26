@@ -59,6 +59,7 @@ def detail(request, lecture_id):
 
     if request.method == 'POST': #날짜 누를 때
         username = request.user.username
+        lecture = Lecture.objects.get(id=lecture_id)
         group_value = request.user.groups.values()
         form = FindDateForm(request.POST)
         if form.is_valid:
@@ -73,6 +74,6 @@ def detail(request, lecture_id):
             except ObjectDoesNotExist:
                 lecture_in_date = None
 
-        context = {'lecture_list':lecture_list, 'group':group_value[0]["name"],'form':form, 'posts':lecture_in_date}
+        context = {'lecture_list':lecture_list, 'lecture':lecture, 'group':group_value[0]["name"],'form':form, 'posts':lecture_in_date}
         return render(request,'student_detail.html', context)
 
