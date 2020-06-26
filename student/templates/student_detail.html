@@ -64,19 +64,25 @@
                     }
                     else if (final_result == "출석") {
                         // document.write("<td>" + "&#9711;" + "<a href='' onclick='func()' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#9711;"+ "</td>");
+                        document.write("<td>" + "&#9711;" + "</td>");
 
                     }
                     else if (final_result == "지각") {
                         // document.write("<td>" + "&#9651;" + "<a href='' onclick='func()' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#9651;"+ "</td>");
+                        document.write("<td>" + "&#9651;" + "</td>");
                     }
                     else {
                         // document.write("<td>" + "&#10006;" + "<a href='' onclick='func(attend_time)' style='float: right;'>" + "상세 출결 결과 확인" + "</a>" + "</td>");
-                        document.write("<td>" + "&#10006;"+ "</td>");
+                        document.write("<td>" + "&#10006;" + "</td>");
                     }
                 </script>
-                <td><a href='{% url 'attend_detail' attend.lecture.id attend.time %}' onclick="window.open(this.href,'_blanck', 'width=600,height=250');return false;" style='float: right;'>상세 출결 결과 확인</a></td>
+                {% if attend.final_result == "처리중"%}
+                <td style='float: right;'>상세 출결 결과 준비중</td>
+                {%else%}
+                <td><a href='{% url 'attend_detail' attend.lecture.id attend.time %}'
+                        onclick="window.open(this.href,'_blanck', 'width=600,height=250');return false;"
+                        style='float: right;'>상세 출결 결과 확인</a></td>
+                {%endif%}
             </tr>
             {%endfor%}
         </tbody>

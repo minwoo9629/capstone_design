@@ -44,7 +44,7 @@
         </div>
     </div>
 </div>
-<div class="container" style = "padding: 0%; text-align: center;">
+<div class="container" style="padding: 0%; text-align: center;">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -79,10 +79,16 @@
                         document.write("<td>"+"&#10006;"+"</td>");
                     }
                 </script>
-                
-                <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}" onclick='window.open(this.href, "test","width=1030, height=600"); return false;'>  상세 출결 결과 확인 </a></td>
+                {% if attend.final_result == "처리중"%}
+                <td style='float: right;'>상세 출결 결과 준비중</td>
+                {%else%}
+                <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}"
+                        onclick='window.open(this.href, "test","width=1030, height=600"); return false;'> 상세 출결 결과 확인
+                    </a></td>
+                {%endif%}
+
             </tr>
-            {%endfor%}         
+            {%endfor%}
         </tbody>
     </table>
     <hr>
