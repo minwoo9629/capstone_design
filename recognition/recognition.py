@@ -8,7 +8,7 @@ from lecture.models import Lecture
 
 def detect_face(user_data, lec):
 	
-	video_path = "http://192.168.0.5:55615/videostream.cgi?user=admin&pwd=isl7528727"
+	video_path = "http://203.230.103.165:16165/videostream.cgi?user=admin&pwd=isl7528727"
 	input_movie = cv2.VideoCapture(video_path)
 	
 
