@@ -4,6 +4,11 @@ from mptt.admin import DraggableMPTTAdmin
 from .models import College
 
 class CollegeAdmin(DraggableMPTTAdmin):
-    list_display = ('tree_actions', 'indented_title', 'parent', 'name')
+    list_display = ('tree_actions','indented_title','parent','name')
 
 admin.site.register(College,CollegeAdmin)
+
+# class CollegeAdmin(DjangoMpttAdmin):
+#     pass
+
+# admin.site.register(College,CollegeAdmin)

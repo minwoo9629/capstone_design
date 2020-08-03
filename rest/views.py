@@ -1,18 +1,33 @@
 from django.shortcuts import render
 from django.contrib import auth
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 from student.models import Student
 from lecture.models import Lecture, Room, Beacon
 from attendance.models import attendance, userlog,facial_attendance
 from .serializer import UserLectureSerializer,MessageSerializer, AttendSerializer, LogSerializer, Facial_AttendSerializer, FinalResultSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
+=======
+from student.models import Student, TakeLectures
+from lecture.models import Lecture, Room, Beacon
+from attendance.models import attendance, facial_attendance, userlog
+from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer, LogSerializer
+from django.http import HttpResponse, Http404
+from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
+<<<<<<< HEAD
 import datetime, time
 import json
+=======
+import datetime, time, json
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 from django.core.exceptions import ObjectDoesNotExist
 
 def final_result_function(lecture_id, username,ymd):
@@ -49,7 +64,11 @@ def final_result_function(lecture_id, username,ymd):
         else:
             attend.final_result = "결석"
     attend.save()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 # 현재 날짜에 따른 요일 값 얻기
 day_of_week = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 today_num = datetime.datetime.today().weekday()
@@ -57,6 +76,22 @@ today = day_of_week[today_num]
 # 현재 시간(hour) 값
 current_time = time.strftime('%H:%M', time.localtime(time.time()))
 
+<<<<<<< HEAD
+=======
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'uuid' : user.student.college.uuid,
+        })
+        
+
+
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 class UserLectureData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
@@ -66,6 +101,7 @@ class UserLectureData(APIView):
 
         # 금일 학생의 수강 과목
         student = Student.objects.get(username=username)
+<<<<<<< HEAD
         today_student_lectures = student.take_lectures.filter(day_of_the_week=today)
         # 현재 시간에 따른 수강해야할 강의 목록
         a = today_student_lectures.filter(start_time__gte="14:00")
@@ -102,6 +138,50 @@ class UserLectureData(APIView):
             data = {'username':username, 'message': '현재 수강할 강의가 없습니다.'}
             serializer_class = MessageSerializer(data)
             return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT)
+=======
+        lecture_list = student.take_lectures.filter(day_of_the_week=today)
+        # 현재 시간에 따른 수강해야할 강의 목록
+        # lecture_list = today_student_lectures.filter(end_time__gte="14:00")
+        
+        def get_lecture(lecture_list):
+            sequence = []
+            lecture_id = []
+            order_lecture_list = lecture_list.order_by('start_time')
+            for num in range(len(order_lecture_list)):
+                sequence.append(num+1)
+
+            for lecture in order_lecture_list:
+                lecture_id.append(lecture.id)
+            
+            lecture_data = dict(zip(sequence,lecture_id))
+            return lecture_data
+
+        if lecture_list is not None:
+            lecture_data = get_lecture(lecture_list)
+            return Response(lecture_data, status=status.HTTP_200_OK)
+        else:
+            data = {'message': '현재 수강할 강의가 없습니다.'}
+            serializer_class = MessageSerializer(data)
+            return Response(serializer_class.data, status=status.HTTP_204_NO_CONTENT) 
+            
+
+class LectureData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        username = request.user.get_username()
+        lecture_id = request.data['lecture_id']
+        lecture = Lecture.objects.get(id=lecture_id)
+        name = lecture.name
+        term = lecture.term
+        count = lecture.count
+        start_time = lecture.start_time.strftime("%H:%M")
+        beacon_major = lecture.room_code.beacon.major
+        beacon_minor = lecture.room_code.beacon.minor
+        data = {'name':name, 'term':term, 'count':count, 'beacon_major':beacon_major, 'beacon_minor':beacon_minor, 'start_time':start_time}
+        serializer_class = LectureSerializer(data)
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
     
 class AttendData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
@@ -189,16 +269,28 @@ class Facial_AttendData(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 class UserPostViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
 
+<<<<<<< HEAD
 class FinalResultData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
     def get(self, request):
+=======
+
+class FinalResultData(APIView):
+    authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
         username = request.user.get_username()
         ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
         lecture_id = request.data['lecture']
@@ -238,4 +330,8 @@ class UserLogData(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+<<<<<<< HEAD
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+=======
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7

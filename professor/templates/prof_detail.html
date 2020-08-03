@@ -44,6 +44,7 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 <div class="container" style = "padding: 0%; text-align: center;">
     <table class="table table-striped">
         <thead>
@@ -52,6 +53,16 @@
                 <th >학번</th>
                 <th >출석 결과</th> 
                 <th>  </th>
+=======
+<div class="container" style="padding: 0%; text-align: center;">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">학번</th>
+                <th scope="col">출결 결과</th>
+                <th></th>
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
             </tr>
         </thead>
 
@@ -60,6 +71,7 @@
             {%for attend in attends%}
 
             <tr>
+<<<<<<< HEAD
                 
                     <script type=text/javascript>
                         // function showPopup() {
@@ -99,6 +111,37 @@
 
   
             </form>
+=======
+                <script type=text/javascript>
+                    var increase = 1;
+                    document.write("<td>" + increase++ + "</td>")
+                    document.write("<td>" + {{attend.username.username}} + "</td>");
+
+                    var result = "{{attend.final_result}}"
+                    if(result == "처리중"){
+                        document.write("<td>"+result+"</td>");
+                    }
+                    else if(result == "출석"){
+                        document.write("<td>"+"&#9711;"+"</td>");
+                    }
+                    else if(result == "지각"){
+                        document.write("<td>"+"&#9651;"+"</td>");
+                    }
+                    else{
+                        document.write("<td>"+"&#10006;"+"</td>");
+                    }
+                </script>
+                {% if attend.final_result == "처리중"%}
+                <td style='float: right;'>상세 출결 결과 준비중</td>
+                {%else%}
+                <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}"
+                        onclick='window.open(this.href, "test","width=1030, height=600"); return false;'> 상세 출결 결과 확인
+                    </a></td>
+                {%endif%}
+
+            </tr>
+            {%endfor%}
+>>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
         </tbody>
     </table>
     <hr>

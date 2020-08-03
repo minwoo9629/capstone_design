@@ -1,10 +1,6 @@
-from django.urls import path,include
-from rest_framework.routers import DefaultRouter
-from attendance import views
-
-router = DefaultRouter()
-router.register('attend', views.AttendViewSet)
+from . import views
+from django.urls import path, include
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('attend/<int:lecture_id>/<str:attend_time>/', views.detail, name="attend_detail"),
 ]

@@ -3,13 +3,12 @@
 <html lang="ko">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Simple Sidebar - Start Bootstrap Template</title>
+    <title>전자 출결 시스템</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{%static 'index/vendor/bootstrap/css/bootstrap.min.css'%}" rel="stylesheet">
@@ -27,9 +26,17 @@
         <div class="bg-light border-right" id="sidebar-wrapper">
             <div class="sidebar-heading">진행 강의</div>
             <div class="list-group list-group-flush">
+                {% if group == "student" %}
                 {%for lecture in lecture_list%}
-                <a href="{%url 'detail' lecture.lectures.id%}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
+                <a href="{%url 'student_detail' lecture.lectures.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
                 {%endfor%}
+                {% elif group == "professor" %}
+                {%for lecture in lecture_list%}
+                <a href="{%url 'prof_detail' lecture.lectures.id %}" class="list-group-item list-group-item-action bg-light">{{lecture.lectures}}</a>
+                {%endfor%}
+                {%endif%}
+                
+
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -50,8 +57,11 @@
                     <!-- <ul class="navbar-nav ml-auto mt-2 mt-lg-0"> -->
                     <ul class="nav nav-tabs ml-auto mt-2 mt-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link active" href="{%url 'prof'%}">Home <span
-                                    class="sr-only">(current)</span></a>
+                            {% if group == "student" %}
+                            <a class="nav-link active" href="{%url 'student'%}">Home <span class="sr-only">(current)</span></a>
+                            {% elif group == "professor" %}
+                            <a class="nav-link active" href="{%url 'prof'%}">Home <span class="sr-only">(current)</span></a>
+                            {%endif%}
                         </li>
                         <li class="nav-item">
                             <a class="nav-link disabled" style="color: black;">{{user.username}} 로그인 중</a>
