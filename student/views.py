@@ -1,12 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth
 from django.contrib.auth.models import User
-<<<<<<< HEAD
-#from .models import enroll
-from attendance.models import attendance
-from lecture.models import Lecture
-# Create your views here.
-=======
 from attendance.models import attendance
 from lecture.models import Lecture
 from .models import TakeLectures
@@ -16,17 +10,12 @@ from datetime import datetime
 from time import strftime
 from django.core.exceptions import ObjectDoesNotExist
 
->>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 def student(request):
     # 현재 접속 중인 학생의 학번 추출
     username = request.user.get_username()
-<<<<<<< HEAD
-    return render(request,'student.html')
-=======
     group_value = request.user.groups.values()
     lecture_list = TakeLectures.objects.filter(username=username)
     return render(request,'student.html',{'lecture_list':lecture_list, 'group':group_value[0]["name"]})
->>>>>>> d152129f14e52b9f39da01d2821a757358faa7e7
 
 def logout(request):
     if request.method == 'POST':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from django.db import models
 import jsonfield
 from professor.models import Professor
@@ -27,7 +28,6 @@ class Lecture(models.Model):
     count = models.IntegerField(verbose_name="반복 횟수", null=True)
 
     
-
     def __str__(self):
         return self.name
 
