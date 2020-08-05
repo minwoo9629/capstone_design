@@ -7,4 +7,5 @@ urlpatterns = [
     path('prof/<int:lecture_id>/', views.detail, name="prof_detail"),
     path('prof/<int:lecture_id>/date/', views.detail, name='prof_date'),
     path('prof/<int:lecture_id>/<username>/<date>', views.show_detail, name='show'),
+    path('prof/excel/download/<int:lecture_id>', views.download, name="download"),
 ]

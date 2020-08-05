@@ -1,9 +1,28 @@
 {% extends 'base.html'%}
 {% block content %}
+{% load static%}
 <br>
-<!-- <button type="button" class="btn btn-outline-dark">금주 출석 조회</button> -->
+<i class="far fa-bell"></i>
+<div class="contatiner" style="text-align: center;">
+    <h4 class="cafe24">출석 알림</h4>
+</div>
 <br>
-<p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p>
+<div class="row">
+    {% for lecture in lecture_list %}
+    <div class="col-sm-4">
+        <div class="card" style="margin-bottom: 3%;">
+            <h5 class="card-header cafe24" style="color:#0080FF; font-weight: bold;">{{lecture.lectures.name}}</h5>
+            <div class="card-body">
+                <h5 class="card-title cafe24">최근 출석 현황</h5>
+                <p class="card-text cafe24">With supporting text below as a natural lead-in to additional content.
+                </p>
+                <a type="button" href="{%url 'student_detail' lecture.lectures.id%}" class="btn btn-outline-info cafe24">출석 조회</a>
+            </div>
+        </div>
+    </div>
+    {%endfor%}
+</div>
+
+
+<!-- <p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p> -->
 {% endblock %}
-
-

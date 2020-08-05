@@ -1,37 +1,100 @@
 {% extends 'base.html'%}
 {% block content %}
-
+{% load static %}
 <style>
     .row {
-        border: 3px solid black;
-
+        border: 2px solid #A9D0F5;
+        border-radius: 10px;
     }
 
     .col {
         box-sizing: border-box;
-
         margin: 15px;
+    }
+
+    .attend_table {
+        padding: 0%;
+        border-left: 1px solid #E6E6E6;
+        border-right: 1px solid #E6E6E6;
     }
 </style>
 
 <br>
-
+<script>
+    function none_date_alert(){
+        alert("출석 값이 없습니다.")
+    }
+</script>
 <div class="container">
-    <div class='row'>
+    <div class='row select_box'>
         <div class="col" id="check" style="border-right:1px solid black;">
             <form method="POST">
                 {% csrf_token %}
-                <p>출결 로그 조회</p>
-                {{form}}
-                <button type='submit' class="btn btn-outline-primary">선택</button>
+                <p class="brba">날짜별 출결 조회</p>
+                <select class="form-control col-sm cafe24" id="exampleFormControlSelect1" name="date">
+                    {% if dates %}
+                    {%for date in dates%}
+                    <option value="{{date}}" class="cafe24" selected="selected">{{date}}</option>
+                    {%endfor%}
+                    {%else%}
+                    <option value="" selected="selected">-----</option>
+                    {%endif%}
+                </select>
+                <br>
+                {% if dates %}
+                <button type='submit' class="btn btn-outline-primary btn-sm cafe24">선택</button>
+                <a type='button' href="{%url 'student_detail' lecture.id %}"
+                    class="btn btn-outline-primary btn-sm cafe24">전체보기</a>
+                {%else%}
+                <button type="button" class="btn btn-outline-primary btn-sm cafe24" onclick="none_date_alert()">선택</button>
+                <button type="button" class="btn btn-outline-primary btn-sm cafe24" onclick="none_date_alert()">전체보기</a>
+                {%endif%}
 
-                <p id='test'> </p>
+
             </form>
         </div>
+        <script>
+
+            var i = 0;
+            window.onload = function move() {
+                if (i == 0) {
+                    i = 1;
+                    var elem = document.getElementById("attend_progress_bar");
+                    var value = "{{progress_value}}";
+                    var width = 10;
+                    var id = setInterval(frame, 20);
+                    function frame() {
+                        if (width >= value) {
+                            clearInterval(id);
+                            i = 0;
+                        } else {
+                            width++;
+                            elem.style.width = width + "%";
+                            elem.innerHTML = width + "%";
+                        }
+                    }
+                }
+            }
+        </script>
         <div class="col" id="time">
             <ul>
                 <li>강의 : {{lecture}}</li>
                 <li>학생 : {{user.last_name}}{{user.first_name}}</li>
+                <li>출석률</li>
+                <br>
+                <div class="progress">
+                    {% if progress_value == 100 %}
+                    <div class="progress-bar bg-info" id="attend_progress_bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                    {% elif progress_value >= 60 %}
+                    <div class="progress-bar bg-success" id="attend_progress_bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    {% elif progress_value >= 20 %}
+                    <div class="progress-bar bg-warning" id="attend_progress_bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    {%elif progress_value >= 0 %}
+                    <div class="progress-bar bg-danger" id="attend_progress_bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    {%else%}
+                    <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress_value}}</div>
+                    {%endif%}
+                </div>
             </ul>
         </div>
     </div>
@@ -39,7 +102,7 @@
 
 <br>
 
-<div class="container" style="padding: 0%; border-left: 1px solid #E6E6E6; border-right: 1px solid #E6E6E6;">
+<div class="container attend_table">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -54,9 +117,9 @@
         <tbody>
             {% for attend in posts %}
             <tr>
-                <td>{{attend.id}}</td>
-                <td>{{attend.username}}</td>
-                <td>{{attend.time}}</td>
+                <td class="cafe24">{{attend.id}}</td>
+                <td class="cafe24">{{attend.username}}</td>
+                <td class="cafe24">{{attend.time}}</td>
                 <script>
                     var final_result = "{{attend.final_result}}"
                     if (final_result == "처리중") {
@@ -77,9 +140,9 @@
                     }
                 </script>
                 {% if attend.final_result == "처리중"%}
-                <td style='float: right;'>상세 출결 결과 준비중</td>
+                <td class="cafe24" style='float: right;'>상세 출결 결과 준비중</td>
                 {%else%}
-                <td><a href='{% url 'attend_detail' attend.lecture.id attend.time %}'
+                <td><a class="cafe24" href='{% url 'attend_detail' attend.lecture.id attend.time %}'
                         onclick="window.open(this.href,'_blanck', 'width=600,height=250');return false;"
                         style='float: right;'>상세 출결 결과 확인</a></td>
                 {%endif%}
@@ -89,36 +152,38 @@
     </table>
     <hr>
 </div>
+
+
 <div class="container">
     <br><br>
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
-            <a class="page-link" href="?page=1">처음</a>
+            <a class="page-link cafe24" href="?page=1">처음</a>
             {%if post.has_previous%}
-            <a class="page-link" href="?page={{post.previous_page_number}}">이전</a>
+            <a class="page-link cafe24" href="?page={{post.previous_page_number}}">이전</a>
             {% else %}
-            <a class="page-link" href="#">이전</a>
+            <a class="page-link cafe24" href="#">이전</a>
             {%endif%}
             {% for page in page_range%}
             {%if page == post.number%}
-            <li class="page-item active" aria-current="page" {% if page == post.number %}class="active" {% endif %}>
-                <a class="page-link" href="?page={{page}}">{{page}}<span class="sr-only">(current)</span></a>
+            <li class="page-item active cafe24" aria-current="page" {% if page == post.number %}class="active"
+                {% endif %}>
+                <a class="page-link cafe24" href="?page={{page}}">{{page}}<span class="sr-only">(current)</span></a>
             </li>
             {%else%}
             <li class="page-item" {% if page == post.number %}class="active" {% endif %}>
-                <a class="page-link" href="?page={{page}}">{{page}}</a>
+                <a class="page-link cafe24" href="?page={{page}}">{{page}}</a>
             </li>
             {%endif%}
 
             {% endfor %}
             {%if post.has_next%}
-            <a class="page-link" href="?page={{post.next_page_number}}">다음</a>
+            <a class="page-link cafe24" href="?page={{post.next_page_number}}">다음</a>
             {%else%}
-            <a class="page-link" href="#">다음</a>
+            <a class="page-link cafe24" href="#">다음</a>
             {%endif%}
-            <a class="page-link" href="?page={{post.paginator.num_pages}}">끝</a>
+            <a class="page-link cafe24" href="?page={{post.paginator.num_pages}}">끝</a>
         </ul>
     </nav>
-
 </div>
 {% endblock %}

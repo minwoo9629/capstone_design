@@ -9,6 +9,7 @@ urlpatterns = [
     path('',include('manager.urls')),
     path('',include('student.urls')),
     path('',include('professor.urls')),
+    path('',include('lecture.urls')),
     path('',include('rest.urls')),
 ]
 

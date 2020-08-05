@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ko">
 
 <head>
@@ -23,6 +24,8 @@
     <link rel="manifest" href="/docs/4.4/assets/img/favicons/manifest.json">
     <link rel="mask-icon" href="/docs/4.4/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
     <link rel="icon" href="/docs/4.4/assets/img/favicons/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="{% static 'student/cafe24_font.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'index/css/JSDongkang_font.css' %}">
     <meta name="msapplication-config" content="/docs/4.4/assets/img/favicons/browserconfig.xml">
     <meta name="theme-color" content="#563d7c">
 
@@ -100,7 +103,7 @@
 <body class="text-center">
     <form class="form-signin" method="POST" action="{%url 'main'%}">
         {% csrf_token %}
-        <h1 class="h3 mb-3 font-weight-normal">전자 출결 시스템</h1>
+        <h1 class="h3 mb-3 font-weight-normal JSDongkang">전자 출결 시스템</h1>
         <label for="inputID" class="sr-only">ID</label>
         <input name="username" type="text" id="inputID" class="form-control" placeholder="ID" required autofocus>
         <br>
@@ -111,7 +114,7 @@
                 <input type="checkbox" value="remember-me"> Remember me
             </label>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">로그인</button>
+        <button class="btn btn-lg btn-primary btn-block JSDongkang" type="submit">로그인</button>
     </form>
 
 
