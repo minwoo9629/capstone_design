@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework import viewsets, status
 import datetime, time, json
 from django.core.exceptions import ObjectDoesNotExist
-
+from recognition.recognition import detect_face
 def final_result_function(lecture_id, username,ymd):
     attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
     facial_attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
@@ -137,6 +137,8 @@ class AttendData(APIView):
         # 요청 받은 출석 결과
         result_data = request.data['result']
         lecture_id = request.data['lecture']
+        #얼굴인식  실행
+       
         try:
             attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
 
@@ -147,7 +149,11 @@ class AttendData(APIView):
             result_data = json.loads(result_data)
             attend_result.update(result_data)
             result = json.dumps(attend_result)
-            
+
+            #username으로 사진 경로 찾기
+            user = Student.objects.get(username=username)
+            a = detect_face(user,lecture_id, list(result_data.keys()))
+            print(a)
             edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
             serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
