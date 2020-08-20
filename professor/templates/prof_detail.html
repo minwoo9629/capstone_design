@@ -11,6 +11,7 @@
         box-sizing: border-box;
         margin: 15px;
     }
+
     .attend_table {
         padding: 0%;
         border-left: 1px solid #E6E6E6;
@@ -27,9 +28,9 @@
 <div class="container">
     <div class='row'>
         <div class="col" id="check" style="border-right:1px solid black;">
-            <form method="POST" action="{% url 'prof_detail' lecture_detail.id %}">
+            <form method="POST" action="{% url 'prof_detail' lecture_inform.id %}">
                 {% csrf_token %}
-                <p class="brba">날짜별 출결 조회</p>
+                <p class="brba"><i class="far fa-clock"></i> 날짜별 출결 조회</p>
                 <select class="form-control col-sm cafe24" id="exampleFormControlSelect1" name="date">
                     {% if dates%}
                     {%for date in dates%}
@@ -70,12 +71,9 @@
                 }
             }
         </script>
-        <div class="col" id="time">
-            <ul>
-                <li>수업 시간 {{lecture_detail.start_time}} ~ {{lecture_detail.end_time}}</li>
-                <li>출석 체크 반복 시간</li>
-                <li>횟수</li>
-                <!-- <li>출석률</li>
+        <div class="col lecture_inform" id="lecture_inform">
+            {% include 'lecture_information.html'%}
+            <!-- <li>출석률</li>
                 <br>
                 <div class="progress">
                     {% if progress_value == 100 %}
@@ -90,13 +88,13 @@
                     <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress_value}}</div>
                     {%endif%}
                 </div> -->
-            </ul>
+
         </div>
     </div>
 </div>
 <div class="container" style="padding-top:2.5%;padding-bottom:5%; padding-right: 0%;">
-    <form action="{%url 'download' lecture_detail.id%}">
-        <button type="submit" class="btn btn-outline-info" style="float: right;">출결 결과 다운로드</button>
+    <form action="{%url 'download' lecture_inform.id%}">
+        <button type="submit" class="btn btn-outline-info" style="float: right;"><i class="fas fa-file-download"></i>출결 결과 다운로드</button>
     </form>
 </div>
 <div class="container" style="padding: 0%; text-align: center;">
@@ -137,7 +135,7 @@
                 {% if attend.final_result == "처리중"%}
                 <td style='float: right;'>상세 출결 결과 준비중</td>
                 {%else%}
-                <td> <a href="{% url 'show' lecture_detail.id attend.username.username date %}"
+                <td> <a href="{% url 'show' lecture_inform.id attend.username.username date %}"
                         onclick='window.open(this.href, "test","width=1030, height=600"); return false;'> 상세 출결 결과 확인
                     </a></td>
                 {%endif%}
@@ -179,4 +177,5 @@
         </nav>
     </div>
 </div>
+{% include 'example.html'%}
 {% endblock %}

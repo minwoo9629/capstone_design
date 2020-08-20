@@ -1,24 +1,9 @@
 {% extends 'base.html'%}
 {% block content %}
 {% load static %}
-<style>
-    .row {
-        border: 2px solid #A9D0F5;
-        border-radius: 10px;
-    }
-
-    .col {
-        box-sizing: border-box;
-        margin: 15px;
-    }
-
-    .attend_table {
-        padding: 0%;
-        border-left: 1px solid #E6E6E6;
-        border-right: 1px solid #E6E6E6;
-    }
-</style>
-
+<head>
+    <link rel="stylesheet" href="{% static 'student/student_detail.css'%}">
+</head>
 <br>
 <script>
     function none_date_alert(){
@@ -27,7 +12,7 @@
 </script>
 <div class="container">
     <div class='row select_box'>
-        <div class="col" id="check" style="border-right:1px solid black;">
+        <div class="col" id="check">
             <form method="POST">
                 {% csrf_token %}
                 <p class="brba">날짜별 출결 조회</p>
@@ -54,7 +39,6 @@
             </form>
         </div>
         <script>
-
             var i = 0;
             window.onload = function move() {
                 if (i == 0) {
@@ -78,7 +62,7 @@
         </script>
         <div class="col" id="time">
             <ul>
-                <li>강의 : {{lecture}}</li>
+                <li>강의 : {{lecture.name}}</li>
                 <li>학생 : {{user.last_name}}{{user.first_name}}</li>
                 <li>출석률</li>
                 <br>

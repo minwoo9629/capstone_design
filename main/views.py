@@ -17,7 +17,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from attendance.models import attendance
+from attendance.models import Attendance
 
 # Create your views here.
 def main(request):
@@ -41,3 +41,8 @@ def main(request):
         return render(request, 'main.html')
         # GET 요청인 경우 로그인 화면
     return render(request,'main.html')
+
+def login_check(request):
+    if request.method == 'POST':
+
+        return JsonResponse(data)

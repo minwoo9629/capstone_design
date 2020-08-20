@@ -1,0 +1,38 @@
+{%load static%}
+<form method="POST" url_data="{%url 'lecture_setting' lecture.id%}" class="edit-form">
+    {%csrf_token%}
+    <div class="modal-header">
+        <h5 class="modal-title">{{lecture.name}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="input_start_time">수업 시작 시간</label>
+                <input type="time" class="form-control" id="input_start_time" name="start_time"
+                    value="{{form.start_time.value|time:'H:i'}}">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="input_end_time">수업 종료 시간</label>
+                <input type="time" class="form-control" id="input_end_time" value="{{form.end_time.value|time:'H:i'}}"
+                    name="end_time">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="input_term">출석 반복 주기(분)</label>
+                {{form.term}}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="input_count">출석 반복 횟수</label>
+                <input type="number" class="form-control" id="input_count"
+                    value="{{ form.count.value|default_if_none:''}}" name="count">
+            </div>
+        </div>
+        <br>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" id="lecture_edit_btn" class="btn btn-primary">수정</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+    </div>
+</form>

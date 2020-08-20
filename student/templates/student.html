@@ -1,28 +1,40 @@
 {% extends 'base.html'%}
 {% block content %}
 {% load static%}
-<br>
-<i class="far fa-bell"></i>
-<div class="contatiner" style="text-align: center;">
-    <h4 class="cafe24">출석 알림</h4>
-</div>
-<br>
-<div class="row">
-    {% for lecture in lecture_list %}
-    <div class="col-sm-4">
-        <div class="card" style="margin-bottom: 3%;">
-            <h5 class="card-header cafe24" style="color:#0080FF; font-weight: bold;">{{lecture.lectures.name}}</h5>
-            <div class="card-body">
-                <h5 class="card-title cafe24">최근 출석 현황</h5>
-                <p class="card-text cafe24">With supporting text below as a natural lead-in to additional content.
-                </p>
-                <a type="button" href="{%url 'student_detail' lecture.lectures.id%}" class="btn btn-outline-info cafe24">출석 조회</a>
+<head>
+    <link rel="stylesheet" href="{% static 'student/student_html.css'%}">
+</head>
+<header>
+    <div class="container">
+        <div class="page-header-content pt-4">
+            <div class="col-auto mt-4">
+                <h1 class="page-header-title NanumBarunGothic"><i class="fas fa-user-check"></i>최근 출석</h1>
+                <div class="page-header-subtitle">
+                    최근 3주 출결 결과 확인
+                </div>
             </div>
         </div>
     </div>
-    {%endfor%}
+</header>
+<div class="row container" id="attend_card_container">
+    {% for lecture in lecture_list %}
+    <div class="col-sm-4" id="attend_card">
+        <div class="card h-100" style="margin-bottom: 3%;">
+            <h5 class="card-header cafe24"">
+                {{lecture.lectures.name}}</h5>
+            <div class=" card-body" style="text-align: center;">
+                {% for key, values in lately_attendance.items %}
+                {% if lecture.lectures.name == key %}
+                {% for value in values %}
+                <p class="card-text cafe24">{{value}}</p>
+                {%endfor%}
+                {%endif%}
+                {%endfor%}
+                <a type="button" href="{%url 'student_detail' lecture.lectures.id%}"
+                    class="btn btn-outline-info cafe24">출석 조회</a>
+        </div>
+    </div>
 </div>
-
-
-<!-- <p>사진 : <img style="width: 200px; height: 300;" src="{{user.student.photo.url}}"></p> -->
+{%endfor%}
+</div>
 {% endblock %}

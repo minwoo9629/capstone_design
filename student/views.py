@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth
 from django.contrib.auth.models import User
-from attendance.models import attendance
+from attendance.models import Attendance
 from lecture.models import Lecture
 from .models import TakeLectures
 from django.core.paginator import Paginator
 from datetime import datetime
 from time import strftime
 from django.core.exceptions import ObjectDoesNotExist
+import json
 
 
 def student(request):
@@ -15,7 +16,20 @@ def student(request):
     username = request.user.get_username()
     group_value = request.user.groups.values()
     lecture_list = TakeLectures.objects.filter(username=username)
-    return render(request, 'student.html', {'lecture_list': lecture_list, 'group': group_value[0]["name"]})
+    lately_attendance = dict()
+    for lecture in lecture_list:
+        lately_attendance_value = []
+        attendance_queryset = Attendance.objects.filter(username=username).filter(lecture=lecture.lectures).order_by('-time')[:3]
+        if attendance_queryset.exists():
+            for attendance in attendance_queryset:
+                # lately_attendance_value[attendance.time] = attendance.final_result
+                lately_attendance_value.append(str(attendance.time) + " " + attendance.final_result)
+        else:
+            lately_attendance_value.append("등록된 출석이 없습니다.")
+
+        lately_attendance[lecture.lectures.name] = lately_attendance_value
+    context = {'lecture_list': lecture_list, 'group': group_value[0]["name"], 'lately_attendance':lately_attendance}   
+    return render(request, 'student.html', context)
 
 
 def logout(request):
@@ -29,7 +43,7 @@ def detail(request, lecture_id):
 
     username = request.user.username
     group_value = request.user.groups.values()
-    date_queryset = attendance.objects.filter(lecture=lecture_id).filter(username=username).values('time').distinct().order_by('time')
+    date_queryset = Attendance.objects.filter(lecture=lecture_id).filter(username=username).values('time').distinct().order_by('time')
     dates = []
     for date in date_queryset:
         dates.append(str(date['time']))
@@ -41,7 +55,7 @@ def detail(request, lecture_id):
         lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
         lecture = Lecture.objects.get(id=lecture_id)
         lecture_list = TakeLectures.objects.filter(username=username)
-        attend_list = attendance.objects.filter(lecture=lecture_id).filter(username=username).order_by('-id')
+        attend_list = Attendance.objects.filter(lecture=lecture_id).filter(username=username).order_by('-id')
         # 해당 수업의 출석들에 대해서 pagination 진행
         num = 5
         paginator = Paginator(attend_list, num)
@@ -71,14 +85,14 @@ def detail(request, lecture_id):
         lecture_list = TakeLectures.objects.filter(username=username)
         date = request.POST['date']
         # 날짜에 맞는 출석 객체
-        select_attend = attendance.objects.filter(username=username).filter(lecture=lecture_id).filter(time=request.POST['date'])
+        select_attend = Attendance.objects.filter(username=username).filter(lecture=lecture_id).filter(time=request.POST['date'])
 
         context = {'lecture_list': lecture_list, 'lecture': lecture,'group': group_value[0]["name"], 'dates': dates, 'posts': select_attend, 'progress_value':progress_value}
         return render(request, 'student_detail.html', context)
 
 
 def attend_progress(lecture_id, username):
-    attend_queryset = attendance.objects.filter(lecture=lecture_id).filter(username=username).order_by('-id')
+    attend_queryset = Attendance.objects.filter(lecture=lecture_id).filter(username=username).order_by('-id')
     if not attend_queryset:
         progress_value = '출석 값이 없습니다.'
     else:

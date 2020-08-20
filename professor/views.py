@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db.models import Count
 from lecture.models import GiveLectures, Lecture
 from .models import Professor
-from attendance.models import attendance,  facial_attendance
+from attendance.models import Attendance,  facial_attendance
 from datetime import datetime
 from .forms import FindDateForm
 import json
@@ -22,9 +22,12 @@ from django.http import HttpResponse
 import sys
 import mimetypes
 import urllib
+
+# modal 구현
+from django.template.loader import render_to_string
+from lecture.forms import LectureSettingForm
+from django.http import JsonResponse
 # Create your views here.
-
-
 def prof(request):
     username = request.user.get_username()
     group_value = request.user.groups.values()
@@ -46,17 +49,16 @@ def detail(request, lecture_id):
     group_value = request.user.groups.values()
     #출석률
     # progress_value = attend_progress(lecture_id)
-    date_queryset = attendance.objects.filter(lecture=lecture_id).values('time').distinct().order_by('time')
+    date_queryset = Attendance.objects.filter(lecture=lecture_id).values('time').distinct().order_by('time')
     dates = []
     for date in date_queryset:
         dates.append(str(date['time']))
 
     if request.method == 'POST':  # 날짜 누를 때
         date_obj = request.POST['date']
-
         lecture_list = GiveLectures.objects.filter(username=username)
-        lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
-        lecture_in_date = attendance.objects.filter(lecture=lecture_detail).filter(time=date_obj).order_by('id')
+        lecture_inform = get_object_or_404(Lecture, pk=lecture_id)
+        lecture_in_date = Attendance.objects.filter(lecture=lecture_inform).filter(time=date_obj).order_by('id')
 
         # 해당 수업의 출석들에 대해서 pagination 진행
         num = 5
@@ -78,21 +80,21 @@ def detail(request, lecture_id):
 
         page_range = paginator.page_range[start_index:end_index]
         
-        context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_detail': lecture_detail,'page_range': page_range, 'date': date_obj, 'group': group_value[0]["name"], 'dates': dates}
+        context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_inform': lecture_inform,'page_range': page_range, 'date': date_obj, 'group': group_value[0]["name"], 'dates': dates}
         return render(request, 'prof_detail.html', context)
 
     elif request.method == 'GET':  # 과목 누를 때
 
         lecture_list = GiveLectures.objects.filter(username=username)
-        lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
+        lecture_inform = get_object_or_404(Lecture, pk=lecture_id)
 
-        context = {'lecture_list': lecture_list, 'lecture_detail': lecture_detail, 'group': group_value[0]["name"], 'dates': dates}
+        context = {'lecture_list': lecture_list, 'lecture_inform': lecture_inform, 'group': group_value[0]["name"], 'dates': dates}
         return render(request, 'prof_detail.html', context)
 
 
 def show_detail(request, lecture_id, username, date):  # student_id : 학번
     this_lecture = get_object_or_404(Lecture, pk=lecture_id)
-    attend = attendance.objects.filter(lecture=this_lecture).filter(time=date).get(username=username)
+    attend = Attendance.objects.filter(lecture=this_lecture).filter(time=date).get(username=username)
     facial_attend = facial_attendance.objects.filter(lecture=this_lecture).filter(time=date).get(username=username)
     
     context = {'attend': attend, 'facial_attend': facial_attend}
@@ -103,15 +105,15 @@ def change_date(request):
     username = request.user.get_username()
     lecture_list = GiveLectures.objects.filter(username=username)
 
-    lecture_detail = get_object_or_404(Lecture, pk=lecture_id)
-    attends = attendance.objects.filter(lecture=lecture_detail)
+    lecture_inform = get_object_or_404(Lecture, pk=lecture_id)
+    attends = Attendance.objects.filter(lecture=lecture_inform)
 
     if request.method == 'POST':
         form = FindDateForm(request.POST)
         if form.is_valid():
             date = form.data('find_date')
     
-    context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_detail': lecture_detail, 'form': form, 'date': date}
+    context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_inform': lecture_inform, 'form': form, 'date': date}
     return render(request, 'prof_check.html', context)
 
 
@@ -119,14 +121,14 @@ def change_date(request):
 def download(request, lecture_id):
     if request.method == "GET":
         lecture_obj = get_object_or_404(Lecture, pk=lecture_id)
-        time_obj = attendance.objects.filter(
+        time_obj = Attendance.objects.filter(
             lecture=lecture_id).values('time').distinct()
         wb = Workbook()
         sheet = wb.active
         for index in time_obj:
             if time_obj[0] == index:
                 sheet.title = str(index['time'])
-                time_attend = attendance.objects.filter(
+                time_attend = Attendance.objects.filter(
                     lecture=lecture_id).filter(time=index['time'])
             else:
                 ws = wb.create_sheet(str(index['time']))
@@ -140,7 +142,7 @@ def download(request, lecture_id):
 
 #출석률
 # def attend_progress(lecture_id):
-#     attend_queryset = attendance.objects.filter(lecture=lecture_id).order_by('-id')
+#     attend_queryset = Attendance.objects.filter(lecture=lecture_id).order_by('-id')
 #     if not attend_queryset:
 #         progress_value = '출석 값이 없습니다.'
 #     else:
@@ -154,3 +156,27 @@ def download(request, lecture_id):
 #             n = (attend_value/all_attend_value)*100
 #             progress_value = round(n)
 #     return progress_value
+
+
+def setting(request, lecture_id):
+    data = dict()
+    lecture = get_object_or_404(Lecture,pk=lecture_id)
+    if request.method == 'POST':
+        form = LectureSettingForm(request.POST)
+        if form.is_valid():
+            lecture.start_time = form.cleaned_data['start_time']
+            lecture.end_time = form.cleaned_data['end_time']
+            lecture.term = form.cleaned_data['term']
+            lecture.count = form.cleaned_data['count']
+            lecture.save()
+            data['form_is_valid'] = True
+            lecture_information = Lecture.objects.get(pk=lecture_id)
+            data['lecture_information'] = render_to_string('lecture_information.html',{'lecture_inform':lecture_information})
+        else:
+            data['form_is_valid'] = False
+    else:
+        form = LectureSettingForm(instance=lecture)
+    
+    context = {'form': form, 'lecture':lecture}
+    data['html_form'] = render_to_string('modal.html',context,request=request)
+    return JsonResponse(data)

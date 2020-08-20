@@ -1,0 +1,19 @@
+.row {
+    border: 2px solid #A9D0F5;
+    border-radius: 10px;
+}
+
+.col {
+    box-sizing: border-box;
+    margin: 15px;
+}
+
+.attend_table {
+    padding: 0%;
+    border-left: 1px solid #E6E6E6;
+    border-right: 1px solid #E6E6E6;
+}
+
+#check {
+    border-right: 1px solid black;
+}

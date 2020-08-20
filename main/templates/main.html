@@ -99,7 +99,6 @@
     <!-- Custom styles for this template -->
     <link href="signin.css" rel="stylesheet">
 </head>
-
 <body class="text-center">
     <form class="form-signin" method="POST" action="{%url 'main'%}">
         {% csrf_token %}
@@ -114,7 +113,7 @@
                 <input type="checkbox" value="remember-me"> Remember me
             </label>
         </div>
-        <button class="btn btn-lg btn-primary btn-block JSDongkang" type="submit">로그인</button>
+        <button class="btn btn-lg btn-primary btn-block JSDongkang" id="login_button" type="submit">로그인</button>
     </form>
 
 
