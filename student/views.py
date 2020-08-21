@@ -43,7 +43,7 @@ def detail(request, lecture_id):
 
     username = request.user.username
     group_value = request.user.groups.values()
-    date_queryset = Attendance.objects.filter(lecture=lecture_id).filter(username=username).values('time').distinct().order_by('time')
+    date_queryset = Attendance.objects.filter(lecture=lecture_id).filter(username=username).values('time').distinct().order_by('-time')
     dates = []
     for date in date_queryset:
         dates.append(str(date['time']))
@@ -83,11 +83,11 @@ def detail(request, lecture_id):
 
         lecture = Lecture.objects.get(id=lecture_id)
         lecture_list = TakeLectures.objects.filter(username=username)
-        date = request.POST['date']
+        selected_date = request.POST['date']
         # 날짜에 맞는 출석 객체
-        select_attend = Attendance.objects.filter(username=username).filter(lecture=lecture_id).filter(time=request.POST['date'])
+        select_attend = Attendance.objects.filter(username=username).filter(lecture=lecture_id).filter(time=selected_date)
 
-        context = {'lecture_list': lecture_list, 'lecture': lecture,'group': group_value[0]["name"], 'dates': dates, 'posts': select_attend, 'progress_value':progress_value}
+        context = {'lecture_list': lecture_list, 'lecture': lecture,'group': group_value[0]["name"], 'dates': dates, 'selected_date':selected_date, 'posts': select_attend, 'progress_value':progress_value}
         return render(request, 'student_detail.html', context)
 
 

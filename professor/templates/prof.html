@@ -1,16 +1,41 @@
 {% extends 'base.html'%}
 {% load static %}
 {% block content%}
-<br>
-<style>
-    .row {
-        border: 3px solid black;
-    }
-    .col {
-        box-sizing: border-box;
-
-        margin: 15px;
-    }
 </style>
-<br>
+<head>
+    <link rel="stylesheet" href="{% static 'professor/prof_html.css'%}">
+</head>
+<header>
+    <div class="container">
+        <div class="page-header-content pt-4">
+            <div class="col-auto mt-4">
+                <h1 class="page-header-title NanumBarunGothic"><i class="fas fa-user-check"></i>최근 출석</h1>
+                <div class="page-header-subtitle">
+                    최근 3주 출결 결과 확인
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="row container" id="attend_card_container">
+    {% for lecture in lecture_list %}
+    <div class="col-sm-4" id="attend_card">
+        <div class="card h-100" style="margin-bottom: 3%;">
+            <h5 class="card-header cafe24"">
+                {{lecture.lectures.name}}</h5>
+            <div class=" card-body" style="text-align: center;">
+                {% for key, values in lately_attendance.items %}
+                {% if lecture.lectures.name == key %}
+                {% for value in values %}
+                <p class="card-text cafe24" id="attend_date" attend_value="{{value}}">{{value}}</p>
+                {%endfor%}
+                {%endif%}
+                {%endfor%}
+                <a type="button" href="{%url 'prof_detail' lecture.lectures.id%}"
+                    class="btn btn-outline-info cafe24">출석 조회</a>
+        </div>
+    </div>
+</div>
+{%endfor%}
+</div>
 {% endblock %}

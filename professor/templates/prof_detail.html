@@ -34,7 +34,11 @@
                 <select class="form-control col-sm cafe24" id="exampleFormControlSelect1" name="date">
                     {% if dates%}
                     {%for date in dates%}
-                    <option value="{{date}}" cafe="cafe24" selected="selected">{{date}}</option>
+                    {% if selected_date == date %}
+                    <option value="{{date}}" class="cafe24" selected="selected">{{date}}</option>
+                    {%else%}
+                    <option value="{{date}}" class="cafe24">{{date}}</option>
+                    {%endif%}
                     {%endfor%}
                     {%else%}
                     <option value="" selected="selected">-----</option>
@@ -96,6 +100,7 @@
     <form action="{%url 'download' lecture_inform.id%}">
         <button type="submit" class="btn btn-outline-info" style="float: right;"><i class="fas fa-file-download"></i>출결 결과 다운로드</button>
     </form>
+    {% include 'example.html'%}
 </div>
 <div class="container" style="padding: 0%; text-align: center;">
     <table class="table table-striped">
@@ -135,7 +140,7 @@
                 {% if attend.final_result == "처리중"%}
                 <td style='float: right;'>상세 출결 결과 준비중</td>
                 {%else%}
-                <td> <a href="{% url 'show' lecture_inform.id attend.username.username date %}"
+                <td> <a href="{% url 'show' lecture_inform.id attend.username.username selected_date %}"
                         onclick='window.open(this.href, "test","width=1030, height=600"); return false;'> 상세 출결 결과 확인
                     </a></td>
                 {%endif%}
@@ -177,5 +182,4 @@
         </nav>
     </div>
 </div>
-{% include 'example.html'%}
 {% endblock %}

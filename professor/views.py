@@ -33,7 +33,18 @@ def prof(request):
     group_value = request.user.groups.values()
     # 개설된 강의 중 교수가 가르치는 강의 객체들을 얻음.
     lecture_list = GiveLectures.objects.filter(username=username)
-    context = {'lecture_list': lecture_list, 'group': group_value[0]["name"]}
+    lately_attendance = dict()
+    for lecture in lecture_list:
+        lately_attendance_value = []
+        attendance_queryset = Attendance.objects.filter(lecture=lecture.lectures).values('time').distinct().order_by('-time')[:3]
+        if attendance_queryset.exists():
+            for attendance in attendance_queryset:
+                lately_attendance_value.append(attendance['time'])
+        else:
+            lately_attendance_value.append("등록된 출석이 없습니다.")
+
+        lately_attendance[lecture.lectures.name] = lately_attendance_value
+    context = {'lecture_list': lecture_list, 'group': group_value[0]["name"], 'lately_attendance':lately_attendance}
     return render(request, 'prof.html', context)
 
 
@@ -49,16 +60,16 @@ def detail(request, lecture_id):
     group_value = request.user.groups.values()
     #출석률
     # progress_value = attend_progress(lecture_id)
-    date_queryset = Attendance.objects.filter(lecture=lecture_id).values('time').distinct().order_by('time')
+    date_queryset = Attendance.objects.filter(lecture=lecture_id).values('time').distinct().order_by('-time')
     dates = []
     for date in date_queryset:
         dates.append(str(date['time']))
 
     if request.method == 'POST':  # 날짜 누를 때
-        date_obj = request.POST['date']
+        selected_date = request.POST['date']
         lecture_list = GiveLectures.objects.filter(username=username)
         lecture_inform = get_object_or_404(Lecture, pk=lecture_id)
-        lecture_in_date = Attendance.objects.filter(lecture=lecture_inform).filter(time=date_obj).order_by('id')
+        lecture_in_date = Attendance.objects.filter(lecture=lecture_inform).filter(time=selected_date).order_by('id')
 
         # 해당 수업의 출석들에 대해서 pagination 진행
         num = 5
@@ -80,7 +91,7 @@ def detail(request, lecture_id):
 
         page_range = paginator.page_range[start_index:end_index]
         
-        context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_inform': lecture_inform,'page_range': page_range, 'date': date_obj, 'group': group_value[0]["name"], 'dates': dates}
+        context = {'attends': attends, 'lecture_list': lecture_list, 'lecture_inform': lecture_inform,'page_range': page_range, 'selected_date': selected_date, 'group': group_value[0]["name"], 'dates': dates}
         return render(request, 'prof_detail.html', context)
 
     elif request.method == 'GET':  # 과목 누를 때
