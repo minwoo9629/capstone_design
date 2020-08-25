@@ -16,8 +16,8 @@ from time import strftime
 from django.core.paginator import Paginator
 
 # 엑셀파일 다운로드 구현
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
+#from openpyxl import Workbook
+#from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse
 import sys
 import mimetypes
@@ -128,27 +128,27 @@ def change_date(request):
     return render(request, 'prof_check.html', context)
 
 
-# 엑셀파일 다운 구현
-def download(request, lecture_id):
-    if request.method == "GET":
-        lecture_obj = get_object_or_404(Lecture, pk=lecture_id)
-        time_obj = Attendance.objects.filter(
-            lecture=lecture_id).values('time').distinct()
-        wb = Workbook()
-        sheet = wb.active
-        for index in time_obj:
-            if time_obj[0] == index:
-                sheet.title = str(index['time'])
-                time_attend = Attendance.objects.filter(
-                    lecture=lecture_id).filter(time=index['time'])
-            else:
-                ws = wb.create_sheet(str(index['time']))
+# # 엑셀파일 다운 구현
+# def download(request, lecture_id):
+#     if request.method == "GET":
+#         lecture_obj = get_object_or_404(Lecture, pk=lecture_id)
+#         time_obj = Attendance.objects.filter(
+#             lecture=lecture_id).values('time').distinct()
+#         wb = Workbook()
+#         sheet = wb.active
+#         for index in time_obj:
+#             if time_obj[0] == index:
+#                 sheet.title = str(index['time'])
+#                 time_attend = Attendance.objects.filter(
+#                     lecture=lecture_id).filter(time=index['time'])
+#             else:
+#                 ws = wb.create_sheet(str(index['time']))
 
-        filename = lecture_obj.name + ".xlsx"
-        file_name = urllib.parse.quote(filename.encode('utf-8'))
-        response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % file_name
-        return response
+#         filename = lecture_obj.name + ".xlsx"
+#         file_name = urllib.parse.quote(filename.encode('utf-8'))
+#         response = HttpResponse(content=save_virtual_workbook(wb), content_type='application/ms-excel')
+#         response['Content-Disposition'] = 'attachment; filename*=UTF-8\'\'%s' % file_name
+#         return response
 
 
 #출석률

@@ -3,7 +3,7 @@ from .recognition import detect_face
 from django.contrib.auth.models import User
 from student.models import Student
 from lecture.models import Lecture
-from attendance.models import attendance, facial_attendance
+from attendance.models import Attendance, facial_attendance
 from datetime import datetime
 from time import strftime, time, localtime
 from django.core.exceptions import ObjectDoesNotExist
@@ -24,7 +24,7 @@ def recognition(request):
 		#print(list(udata.keys())[number])
 		try:
 			user = User.objects.get(username=list(udata.keys())[number])
-			attend = attendance.objects.filter(time=ymd).filter(lecture=lec1).get(username=user)
+			attend = Attendance.objects.filter(time=ymd).filter(lecture=lec1).get(username=user)
 			attend_result = json.loads(attend.result)
 
 			if numbering[number] > 100:

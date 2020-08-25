@@ -1,7 +1,7 @@
 import face_recognition
 import cv2
 from django.conf import settings
-from attendance.models import attendance
+from attendance.models import Attendance
 from student.models import Student
 from django.contrib.auth.models import User
 from lecture.models import Lecture
