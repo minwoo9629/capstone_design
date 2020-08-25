@@ -5,7 +5,7 @@ from lecture.models import Lecture
 import jsonfield
 # Create your models here.
 
-class attendance(models.Model):
+class Attendance(models.Model):
     ResultChoice = [('ATTEND','출석'),('LATE','지각'),('ABSENT','결석')]
     username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="username", limit_choices_to={'groups__name': "student"})
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)

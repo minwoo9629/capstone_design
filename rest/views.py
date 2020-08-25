@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from student.models import Student, TakeLectures
 from lecture.models import Lecture, Room, Beacon
-from attendance.models import attendance, facial_attendance, userlog
+from attendance.models import Attendance, facial_attendance, userlog
 from .serializer import MessageSerializer, AttendSerializer, LectureSerializer, Facial_AttendSerializer, FinalResultSerializer, LogSerializer
 from django.http import HttpResponse, Http404
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication, BasicAuthentication
@@ -17,7 +17,7 @@ import datetime, time, json
 from django.core.exceptions import ObjectDoesNotExist
 
 def final_result_function(lecture_id, username,ymd):
-    attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+    attend = Attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
     facial_attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
     
     attend_list = []
@@ -127,7 +127,7 @@ class AttendData(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         username = request.user.get_username()
-        attend = attendance.objects.filter(username=username)
+        attend = Attendance.objects.filter(username=username)
         serializer_class = AttendSerializer(attend, many=True)
         return Response(serializer_class.data)
     
@@ -138,7 +138,7 @@ class AttendData(APIView):
         result_data = request.data['result']
         lecture_id = request.data['lecture']
         try:
-            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+            attend = Attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
 
             # 기존의 출석 결과 str->dict
             attend_result = json.loads(attend.result)
@@ -147,7 +147,8 @@ class AttendData(APIView):
             result_data = json.loads(result_data)
             attend_result.update(result_data)
             result = json.dumps(attend_result)
-            
+            #
+            #
             edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
             serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
@@ -224,7 +225,7 @@ class FinalResultData(APIView):
         lecture_id = request.data['lecture']
         lecture = Lecture.objects.get(id=lecture_id)
         try:
-            attend = attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
+            attend = Attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
             if attend.final_result == "출석":
                 final_attend = "○"
             elif attend.final_result == "지각":
