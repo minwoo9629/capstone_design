@@ -166,6 +166,9 @@ class AttendData(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
         except ObjectDoesNotExist:
+            result_data = json.loads(result_data)
+            user = Student.objects.get(username=username)
+            a = detect_face(user,lecture_id, list(result_data.keys()))
             serializer = AttendSerializer(data=request.data)
             if serializer.is_valid():   # 직접 유효성 검사
                 serializer.save()       # 저장

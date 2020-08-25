@@ -41,6 +41,7 @@ def detect_face(user_data, lec, key):
 	face_names = []
 	frame_number = 0
 	limit_frame = 200
+	numbering = 0
 	while frame_number < limit_frame:
 		ret, frame = input_movie.read()
 		frame_number += 1
@@ -55,7 +56,7 @@ def detect_face(user_data, lec, key):
 
 
 		for face_encoding in face_encodings:
-			match = face_recognition.compare_faces(encoding, face_encoding, tolerance=0.45)
+			match = face_recognition.compare_faces([encoding], face_encoding, tolerance=0.45)
 			if match:
 				numbering += 1
 				face_names.append(name)
@@ -72,7 +73,7 @@ def detect_face(user_data, lec, key):
 				continue
 			cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-		cv2.imshow('IP camera', frame)
+		#cv2.imshow('IP camera', frame)
 		print("Writing frame {} / {}".format(frame_number, limit_frame))
 		output_movie.write(frame)
 		print(numbering)
@@ -95,17 +96,17 @@ def detect_face(user_data, lec, key):
 		attend_result = json.loads(attend.result)
 
 		if numbering > 100:
-			a = json.loads('{"' + "14" + ':' + "30" +  '" : "ATTEND"}')
+			a = json.loads('{"' + str(key[0]) +  '" : "ATTEND"}')
 		else:
-			a = json.loads('{"' + "14" + ':' + "30" + '" : "ABCENT"}')
+			a = json.loads('{"' + str(key[0]) + '" : "ABSENT"}')
 		attend_result.update(a)
 		result = json.dumps(attend_result)
 		attend.result = result
 		attend.save()
 
 	except ObjectDoesNotExist:
-		suup = Lecture.objects.get(code=lec)
+		suup = Lecture.objects.get(id=lec)
 		if numbering > 100:
-			facial_attendance.objects.create(username=username, lecture=suup, result='{"' + "14" + ':' + "30"  + '" : "ATTEND"}')
+			facial_attendance.objects.create(username=username, lecture=suup, result='{"' + str(key[0])  + '" : "ATTEND"}')
 		else:
-			facial_attendance.objects.create(username=username, lecture=suup, result='{"' + "14" + ':' + "30"  + '" : "ABSENT"}')
+			facial_attendance.objects.create(username=username, lecture=suup, result='{"' + str(key[0])  + '" : "ABSENT"}')
