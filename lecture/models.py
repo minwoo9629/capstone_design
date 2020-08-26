@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from django.db import models
 import jsonfield
 from professor.models import Professor
@@ -26,6 +27,10 @@ class Lecture(models.Model):
     end_time = models.TimeField(verbose_name="수업 종료 시간",auto_now=False, auto_now_add=False, default="00:00")
     term = models.CharField(verbose_name="출석 반복 시간", max_length=5, choices=TERM_CHOICES, default="30")
     count = models.IntegerField(verbose_name="반복 횟수", null=True)
+
+    
+    def __str__(self):
+        return self.name
 
 class GiveLectures(models.Model):
     username = models.ForeignKey(Professor,verbose_name="교수",on_delete=models.CASCADE, to_field='username', db_column="username")

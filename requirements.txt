@@ -2,7 +2,7 @@ asgiref==3.2.3
 certifi==2019.11.28
 chardet==3.0.4
 colorama==0.4.3
-Django==2.0.13
+Django>=2.0.13
 django-js-asset==1.2.2
 django-json-field==0.5.7
 django-jsonfield==1.4.0
@@ -21,3 +21,4 @@ requests==2.23.0
 six==1.14.0
 sqlparse==0.3.1
 urllib3==1.25.8
+Celery>=4.3.0
