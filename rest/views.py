@@ -16,6 +16,8 @@ from rest_framework import viewsets, status
 import datetime, time, json
 from django.core.exceptions import ObjectDoesNotExist
 
+
+# 여기 손봐야함
 def final_result_function(lecture_id, username,ymd):
     attend = Attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
     facial_attend = facial_attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
@@ -57,6 +59,7 @@ today_num = datetime.datetime.today().weekday()
 today = day_of_week[today_num]
 # 현재 시간(hour) 값
 current_time = time.strftime('%H:%M', time.localtime(time.time()))
+
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -126,6 +129,7 @@ class LectureData(APIView):
 class AttendData(APIView):
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]
     permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         username = request.user.get_username()
         attend = Attendance.objects.filter(username=username)
@@ -138,6 +142,10 @@ class AttendData(APIView):
         # 요청 받은 출석 결과
         result_data = request.data['result']
         lecture_id = request.data['lecture']
+        if username == request.data['username']:
+            pass
+        else:
+            raise Http404
         try:
             attend = Attendance.objects.filter(time=ymd).filter(lecture_id=lecture_id).get(username=username)
 
@@ -148,8 +156,7 @@ class AttendData(APIView):
             result_data = json.loads(result_data)
             attend_result.update(result_data)
             result = json.dumps(attend_result)
-            #
-            #
+            
             edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
             serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
@@ -232,13 +239,15 @@ class FinalResultData(APIView):
                 final_attend = "○"
             elif attend.final_result == "지각":
                 final_attend = "△"
+            elif attend.final_result == "처리중":
+                final_attend = "출석 처리중 입니다."    
             else:
                 final_attend = "X"
             data = {'username':username, 'lecture':lecture.name, 'final_attend':final_attend}
             serializer_class = FinalResultSerializer(data)
             return Response(serializer_class.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            raise Http404
 
 class UserLogData(APIView): 
     authentication_classes = [TokenAuthentication,SessionAuthentication,BasicAuthentication]

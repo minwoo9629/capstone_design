@@ -27,6 +27,9 @@ class Lecture(models.Model):
     term = models.CharField(verbose_name="출석 반복 시간", max_length=5, choices=TERM_CHOICES, default="30")
     count = models.IntegerField(verbose_name="반복 횟수", null=True)
 
+    def __str__(self):
+          return self.name
+          
 class GiveLectures(models.Model):
     username = models.ForeignKey(Professor,verbose_name="교수",on_delete=models.CASCADE, to_field='username', db_column="username")
     lectures = models.ForeignKey(Lecture, verbose_name="담당 강의",on_delete=models.CASCADE)

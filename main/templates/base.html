@@ -75,6 +75,11 @@
                             <a class="nav-link disabled cafe24"
                                 style="color: black;"><i class="far fa-user"></i> {{user.last_name}}{{user.first_name}}({{user.username}}) 로그인 중</a>
                         </li>
+                        {% if group == "professor"%}
+                        <li class="nav-item">
+                            <a class="nav-link cafe24" href="{% url 'record'%}">수업 기록 확인</a>
+                        </li>
+                        {%endif%}
                         <li class="nav-item">
                             <a class="nav-link cafe24"
                                 href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
