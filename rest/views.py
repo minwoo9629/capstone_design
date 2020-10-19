@@ -152,8 +152,9 @@ class AttendData(APIView):
 
             #username으로 사진 경로 찾기
             user = Student.objects.get(username=username)
+            
             a = detect_face(user,lecture_id, list(result_data.keys()))
-            print(a)
+            #print(a)
             edit_data = {'username':attend.username, 'lecture':attend.lecture_id, 'result': result}
             serializer = AttendSerializer(attend, data = edit_data)
             # 직접 유효성 검사
