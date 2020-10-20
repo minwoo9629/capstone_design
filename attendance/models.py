@@ -25,4 +25,5 @@ class userlog(models.Model):
     username = models.ForeignKey(User,on_delete=models.CASCADE,to_field='username', db_column="username", limit_choices_to={'groups__name': "student"})
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
     time = models.DateTimeField()
+    date = models.DateField(auto_now=True)
     check = models.CharField(verbose_name="in/out", max_length=5)

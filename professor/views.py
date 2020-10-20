@@ -6,20 +6,22 @@ from django.utils import timezone
 from django.db.models import Count
 from lecture.models import GiveLectures, Lecture
 from .models import Professor
-from attendance.models import Attendance,  facial_attendance, userlog
-from datetime import datetime
+from student.models import TakeLectures
+from attendance.models import Attendance, facial_attendance, userlog
+import datetime, time
 from .forms import FindDateForm
 import json
 from itertools import chain
 from collections import defaultdict
 from time import strftime
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 
 # 엑셀파일 다운로드 구현
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse
-import sys
+import sys, os
 import mimetypes
 import urllib
 
@@ -27,6 +29,7 @@ import urllib
 from django.template.loader import render_to_string
 from lecture.forms import LectureSettingForm
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 
@@ -140,21 +143,67 @@ def change_date(request):
     return render(request, 'prof_check.html', context)
 
 
+
+# crontab 할 함수
+def attend_schedule():
+    day_of_week = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+    today_num = datetime.datetime.today().weekday()
+    today = day_of_week[today_num]
+    lectures = Lecture.objects.filter(day_of_the_week=today)
+    ymd = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+    for lecture in lectures:
+        students = TakeLectures.objects.filter(lectures=lecture)
+        for student in students:
+            try:
+                attend = Attendance.objects.filter(time=ymd).filter(lecture=lecture).get(username=student.username.username)
+                pass
+            except ObjectDoesNotExist:
+                new_attendance = Attendance.objects.create(username=student.username.username,lecture=lecture,final_result="결석")
+            
+
+# 출결 결과에 따른 차감점수 구현
+def attendance_value(value_row):
+    attend = value_row.count('출석')
+    late = value_row.count('지각')
+    absent = value_row.count('결석')
+    value = (attend*0) + (late*-0.5) + (absent * -1)
+    return value;
+
 # 엑셀파일 다운 구현
 def download(request, lecture_id):
     if request.method == "GET":
+        attend_schedule()
         lecture_obj = get_object_or_404(Lecture, pk=lecture_id)
-        time_obj = Attendance.objects.filter(
-            lecture=lecture_id).values('time').distinct()
+        time_obj = Attendance.objects.filter(lecture=lecture_id).values('time').distinct()
+        student_list = TakeLectures.objects.filter(lectures=lecture_id).values('username')
         wb = Workbook()
-        sheet = wb.active
-        for index in time_obj:
-            if time_obj[0] == index:
-                sheet.title = str(index['time'])
-                time_attend = Attendance.objects.filter(
-                    lecture=lecture_id).filter(time=index['time'])
-            else:
-                ws = wb.create_sheet(str(index['time']))
+        write_ws = wb.active
+        one_row = ['학번']
+        value_row = []
+
+        for time in time_obj:
+            time_value = str(time['time'])
+            one_row.append(time_value)
+        one_row.append('차감 점수')    
+        write_ws.append(one_row)
+
+        for student in student_list:
+            value_row.append(student['username'])
+            final_result_obj = Attendance.objects.filter(lecture=lecture_id).filter(username=student['username']).values('final_result')
+            for final_result in final_result_obj:
+                value_row.append(final_result['final_result'])    
+            value = attendance_value(value_row)
+            value_row.append(value)#"$"
+            write_ws.append(value_row)
+            value_row.clear()
+        
+        # for index in time_obj:
+        #     if time_obj[0] == index:
+        #         sheet.title = str(index['time'])
+        #         time_attend = Attendance.objects.filter(
+        #             lecture=lecture_id).filter(time=index['time'])
+        #     else:
+        #         ws = wb.create_sheet(str(index['time']))
 
         filename = lecture_obj.name + ".xlsx"
         file_name = urllib.parse.quote(filename.encode('utf-8'))
@@ -181,7 +230,7 @@ def download(request, lecture_id):
 #             progress_value = round(n)
 #     return progress_value
 
-
+# 수업 출석 시간 및 반복 횟수 설정
 def setting(request, lecture_id):
     data = dict()
     lecture = get_object_or_404(Lecture, pk=lecture_id)
@@ -203,11 +252,11 @@ def setting(request, lecture_id):
         form = LectureSettingForm(instance=lecture)
 
     context = {'form': form, 'lecture': lecture}
-    data['html_form'] = render_to_string(
-        'modal.html', context, request=request)
+    data['html_form'] = render_to_string('modal.html', context, request=request)
     return JsonResponse(data)
 
 
+# 수업 로그 및 영상 확인
 def record(request):
     username = request.user.get_username()
     group_value = request.user.groups.values()
@@ -219,7 +268,8 @@ def record(request):
     lecture_id = request.GET.get('lecture_id', '')
     date = request.GET.get('date', '')
 
-    userlog_obj = userlog.objects.all()
+    userlog_obj = userlog.objects.all().values('date','username','lecture').distinct()
+    # userlog_obj = userlog.objects.all()
     if student_id != '':
         userlog_obj = userlog_obj.filter(username=student_id)
     else:
@@ -229,14 +279,48 @@ def record(request):
     else:
         pass
     if date != '':
-        #선택한 날짜를 date로 변환
-        date = datetime.strptime(date, '%Y-%m-%d').date()
-        userlog_obj = userlog_obj.filter(time__startswith=date)
+        #선택한 날짜를 datetime 형태로 변환
+        datetime_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        userlog_obj = userlog_obj.filter(time__startswith=datetime_date)
     else:
         pass
     
-    paginator = Paginator(userlog_obj, 1)
+    paginator = Paginator(userlog_obj, 5)
     page_obj = paginator.get_page(page)
     
     context = {'lecture_list': lecture_list, 'group': group_value[0]["name"], 'userlog_list':page_obj, 'page':page, 'student_id':student_id, 'lecture_id':lecture_id, 'date':date}
     return render(request, 'record.html', context)
+
+@csrf_exempt
+def record_log(request):
+    data = dict()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        lecture_id = request.POST.get('lecture_id')
+        date = request.POST.get('date')
+        userlog_obj = userlog.objects.filter(username=username).filter(lecture=lecture_id).filter(date=date)
+        data['form_is_valid'] = True
+        context = {'userlog_obj':userlog_obj, 'username':username, 'date':date}
+        data['userlog_obj'] = render_to_string('log_modal.html', context, request=request)
+    else:
+        data['form_is_valid'] = False
+    return JsonResponse(data)
+
+@csrf_exempt
+def record_video(request):
+    data = dict()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        lecture_id = request.POST.get('lecture_id')
+        date = request.POST.get('date')
+        lecture = Lecture.objects.get(id=lecture_id)
+        data['form_is_valid'] = True
+        video_path = 'media/hanbat/video/'+date+'/'+ lecture.name
+        filenames = os.listdir(video_path)
+        print(filenames)
+
+        context = {'video_path':video_path, 'filenames':filenames}
+        data['userlog_obj'] = render_to_string('video_modal.html', context, request=request)
+    else:
+        data['form_is_valid'] = False
+    return JsonResponse(data)

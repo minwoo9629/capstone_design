@@ -1,0 +1,16 @@
+{% load static %}
+<div class="modal-header">
+    <h5 class="modal-title" id="VideoModalLabel">영상 기록</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    </button>
+</div>
+<div class="modal-body">
+    {% for filename in filenames %}
+    <video controls width="500">
+        <source src="/{{video_path}}/{{filename}}" type="video/mp4">
+    </video>
+    {%endfor%}
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-dismiss="modal">확인</button>
+</div>

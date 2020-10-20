@@ -9,22 +9,33 @@
 <div class="container" id='record_search'>
     <div class="form-row">
         <div class="form-group col-md-4">날짜
-            <input class="form-control date cafe24" type="date">
+            {%if date %}
+            <input class="form-control date cafe24" type="date" value="{{date}}">
+            {%else%}
+            <input class="form-control date cafe24" type="date" value="">
+            {%endif%}
         </div>
         <div class="form-group col-md-4">강의
             <select class="form-control lecture_id cafe24" id="exampleFormControlSelect1">
                 {%for lecture in lecture_list%}
                 {% if lecture_id %}
-                {% if lecture_id == lecture.lectures.id %}
+                {% if lecture_id|add:"0" == lecture.lectures.id %}
                 <option value="{{lecture.lectures.id}}" class="cafe24" selected>{{lecture.lectures}}</option>
-                {%endif%}
-                {%endif%}
+                {%else%}
                 <option value="{{lecture.lectures.id}}" class="cafe24">{{lecture.lectures}}</option>
+                {%endif%}
+                {%else%}
+                <option value="{{lecture.lectures.id}}" class="cafe24">{{lecture.lectures}}</option>
+                {%endif%}
                 {%endfor%}
             </select>
         </div>
         <div class="form-group col-md-4">학번
+            {% if student_id %}
             <input class="form-control student_id cafe24" type="text" value="{{student_id}}">
+            {%else%}
+            <input class="form-control student_id cafe24" type="text" value="{{student_id}}">
+            {%endif%}
         </div>
         <div class="col-md-4">
             <button type='button' class="btn btn-outline-primary btn_search cafe24">조회</button>
@@ -46,9 +57,22 @@
             {% if userlog_list %}
             {% for userlog in userlog_list %}
             <tr>
-                <td>{{ userlog.time}}</td>
-                <td>{{userlog.username}}</td>
-                <td>{{ userlog.lecture }}</td>
+                <form class="record_detail_form" method="POST">
+                    {%csrf_token%}
+                    <td><input type="hidden" name="date" value="{{userlog.date|date:'Y-m-d'}}">{{userlog.date}}</td>
+                    <td><input type="hidden" name="username" value="{{userlog.username}}"
+                            id="log_student_id">{{userlog.username}}</td>
+                    {%for lecture in lecture_list%}
+                    {%if userlog.lecture|add:"0" == lecture.lectures.id%}
+                    <td><input type="hidden" name="lecture_id" value="{{lecture.lectures.id}}"
+                            id="log_lecture_id">{{ lecture.lectures }}</td>
+                    {%endif%}
+                    {%endfor%}
+                    <td><button class="btn btn-link" type="submit" url_data="{%url 'record_log'%}">로그 확인</button></td>
+                    <!-- <td><input type="submit" id="LogModal_btn" value="Log"/>로그 확인</td> -->
+                    <!-- <td><a href="#" id="LogModal_link">로그 확인</a></td> -->
+                    <td><button class="btn btn-link" type="submit" url_data="{%url 'record_video'%}">영상 확인</button></td>
+                </form>
             </tr>
             {% endfor %}
             {% else %}
@@ -100,12 +124,13 @@
 <!-- 페이징처리 끝 -->
 </div>
 
-
-
-
-
-
-
+<!-- show log Modal -->
+<div class="modal fade" id="RecordModal" tabindex="-1" aria-labelledby="RecordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
 
 
 <form id="searchForm" method="GET" action="{%url 'record'%}">
@@ -114,6 +139,7 @@
     <input type="hidden" id="student_id" name="student_id" value="{{student_id|default_if_none:''}}">
     <input type="hidden" id="page" name="page" value="{{ page }}">
 </form>
+
 <script>
     $(document).ready(function () {
         $(".page-link").on('click', function () {
@@ -127,6 +153,54 @@
             // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
             $("#page").val(1);
             $("#searchForm").submit()
+        });
+        $("#log").on('click', function () {
+            $("#date").val($(".date").val());
+            $("#lecture_id").val($(".lecture_id").val());
+            $("#student_id").val($(".student_id").val());
+            // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+            $("#page").val(1);
+            $("#searchForm").submit()
+        });
+        
+        // Modal Ajax
+
+        // $(".record_detail_form").on("submit", function (e) {
+        //     e.preventDefault()
+        //     var form = $(this);
+        //     // alert(form.serialize());
+        //     $.ajax({
+        //         type: form.attr('method'),
+        //         url: form.attr('url_data'),
+        //         data: form.serialize(),
+        //         dataType: 'json',
+        //     }).done(function (data) {
+        //         if (data.form_is_valid) {
+        //             $('#LogModal').modal('show');
+        //             $('#LogModal .modal-content').html(data.userlog_obj);
+        //         } else {
+        //             console.log('error');
+        //         }
+        //     });
+        // });
+
+        $(".record_detail_form").on("submit", function (e) {
+            e.preventDefault()
+            var form = $(this);
+            var url_data = ($(document.activeElement).attr('url_data'));
+            $.ajax({
+                type: form.attr('method'),
+                url: url_data,
+                data: form.serialize(),
+                dataType: 'json',
+            }).done(function (data) {
+                if (data.form_is_valid) {
+                    $('#RecordModal').modal('show');
+                    $('#RecordModal .modal-content').html(data.userlog_obj);
+                } else {
+                    console.log('error');
+                }
+            });
         });
     });
 </script>
