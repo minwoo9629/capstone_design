@@ -1,71 +1,115 @@
 {% extends 'base.html'%}
 {% block content%}
 {% load static %}
-<!-- <link href="style" href="{% static 'css/test.css' %}"> */ -->
-
-<br>
 <style>
     .row {
-        border: 3px solid black;
-
+        border: 2px solid #A9D0F5;
+        border-radius: 10px;
     }
 
     .col {
         box-sizing: border-box;
-
         margin: 15px;
     }
+
+    .attend_table {
+        padding: 0%;
+        border-left: 1px solid #E6E6E6;
+        border-right: 1px solid #E6E6E6;
+    }
 </style>
+
+<br>
+<script>
+    function none_date_alert() {
+        alert("출석 값이 없습니다.")
+    }
+</script>
 <div class="container">
     <div class='row'>
         <div class="col" id="check" style="border-right:1px solid black;">
-            <form method="POST" action="">
+            <form method="POST" action="{% url 'prof_detail' lecture_inform.id %}">
                 {% csrf_token %}
-                <p>출결 로그 조회</p>
-                {{form}}
-                <button type='submit' class="btn btn-outline-primary">선택</button>
-
-                <p id='test'> </p>
+                <p class="brba"><i class="far fa-clock"></i> 날짜별 출결 조회</p>
+                <select class="form-control col-sm cafe24" id="exampleFormControlSelect1" name="date">
+                    {% if dates%}
+                    {%for date in dates%}
+                    {% if selected_date == date %}
+                    <option value="{{date}}" class="cafe24" selected="selected">{{date}}</option>
+                    {%else%}
+                    <option value="{{date}}" class="cafe24">{{date}}</option>
+                    {%endif%}
+                    {%endfor%}
+                    {%else%}
+                    <option value="" selected="selected">-----</option>
+                    {%endif%}
+                </select>
+                <br>
+                {% if dates %}
+                <button type='submit' class="btn btn-outline-primary btn-sm cafe24">선택</button>
+                {%else%}
+                <button type="button" class="btn btn-outline-primary btn-sm cafe24"
+                    onclick="none_date_alert()">선택</button>
+                {%endif%}
             </form>
         </div>
-        <div class="col" id="time">
-            <form method="POST">
-                {% csrf_token %}
-                <label>수업 시간 {{lecture_detail.start_time}} ~ {{lecture_detail.end_time}} <button type="submit"
-                        class="btn btn-outline-primary">수정</button></label>
-            </form>
-            <form>
-                <label>출석 체크 반복 시간<input type="time" value='09:00 id=' start'></label>
+        <script>
+            var i = 0;
+            window.onload = function move() {
+                if (i == 0) {
+                    i = 1;
+                    var elem = document.getElementById("attend_progress_bar");
+                    var value = "{{progress_value}}";
+                    var width = 10;
+                    var id = setInterval(frame, 20);
+                    function frame() {
+                        if (width >= value) {
+                            clearInterval(id);
+                            i = 0;
+                        } else {
+                            width++;
+                            elem.style.width = width + "%";
+                            elem.innerHTML = width + "%";
+                        }
+                    }
+                }
+            }
+        </script>
+        <div class="col lecture_inform" id="lecture_inform">
+            {% include 'lecture_information.html'%}
+            <!-- <li>출석률</li>
                 <br>
-                <label>횟수<input type="number" value="5" min="0" id='term'></label>
-                <br>
-                <button type="submit" class="btn btn-outline-primary">저장</button>
-            </form>
+                <div class="progress">
+                    {% if progress_value == 100 %}
+                    <div class="progress-bar bg-info" id="attend_progress_bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                    {% elif progress_value >= 60 %}
+                    <div class="progress-bar bg-success" id="attend_progress_bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    {% elif progress_value >= 20 %}
+                    <div class="progress-bar bg-warning" id="attend_progress_bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    {%elif progress_value >= 0 %}
+                    <div class="progress-bar bg-danger" id="attend_progress_bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    {%else%}
+                    <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress_value}}</div>
+                    {%endif%}
+                </div> -->
+
         </div>
     </div>
 </div>
-<div class="container">
+<div class="container" style="padding-top:2.5%;padding-bottom:5%; padding-right: 0%;">
+    <form action="{%url 'download' lecture_inform.id%}">
+        <button type="submit" class="btn btn-outline-info" style="float: right;"><i class="fas fa-file-download"></i>출결 결과 다운로드</button>
+    </form>
+    {% include 'example.html'%}
+</div>
+<div class="container" style="padding: 0%; text-align: center;">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">학번</th>
-
-                
-
-                <script type=text/javascript>
-                    a = ("{{ attends.0.result }}").replace(/&quot;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    //var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<th>' + key + "</th>");
-                    }  
-                    </script>
-
-                
+                <th scope="col">출결 결과</th>
+                <th></th>
             </tr>
         </thead>
 
@@ -74,24 +118,35 @@
             {%for attend in attends%}
 
             <tr>
-                <td>{{attend.id}}</td>
-                <td>{{attend.username}}</td>
-                
-                    <script type=text/javascript>
-                    a = ("{{ attend.result }}").replace(/&quot;/g, "\"");
-                    //document.write(a)
-                    var a_parse = JSON.parse(a)
-                    //document.write(a_parse)
-                    var num = Object.keys(a_parse).length;
-                    
-                    for(key in a_parse) {
-                        document.write('<td>' + a_parse[key] + '</td>');
-                    }  
+                <script type=text/javascript>
+                    var increase = 1;
+                    document.write("<td>" + increase++ + "</td>")
+                    document.write("<td>" + {{attend.username.username}} + "</td>");
+
+                    var result = "{{attend.final_result}}"
+                    if(result == "처리중"){
+                        document.write("<td>"+result+"</td>");
+                    }
+                    else if(result == "출석"){
+                        document.write("<td>"+"&#9711;"+"</td>");
+                    }
+                    else if(result == "지각"){
+                        document.write("<td>"+"&#9651;"+"</td>");
+                    }
+                    else{
+                        document.write("<td>"+"&#10006;"+"</td>");
+                    }
                 </script>
-                
-                {%endfor%}
+                {% if attend.final_result == "처리중"%}
+                <td style='float: right;'>상세 출결 결과 준비중</td>
+                {%else%}
+                <td> <a href="{% url 'show' lecture_inform.id attend.username.username selected_date %}"
+                        onclick='window.open(this.href, "test","width=1030, height=600"); return false;'> 상세 출결 결과 확인
+                    </a></td>
+                {%endif%}
 
             </tr>
+            {%endfor%}
         </tbody>
     </table>
     <hr>

@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{%block content%}
+<style>
+    #record_search {
+        margin-top: 100px;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<div class="container" id='record_search'>
+    <div class="form-row">
+        <div class="form-group col-md-4">날짜
+            {%if date %}
+            <input class="form-control date cafe24" type="date" value="{{date}}">
+            {%else%}
+            <input class="form-control date cafe24" type="date" value="">
+            {%endif%}
+        </div>
+        <div class="form-group col-md-4">강의
+            <select class="form-control lecture_id cafe24" id="exampleFormControlSelect1">
+                {%for lecture in lecture_list%}
+                {% if lecture_id %}
+                {% if lecture_id|add:"0" == lecture.lectures.id %}
+                <option value="{{lecture.lectures.id}}" class="cafe24" selected>{{lecture.lectures}}</option>
+                {%else%}
+                <option value="{{lecture.lectures.id}}" class="cafe24">{{lecture.lectures}}</option>
+                {%endif%}
+                {%else%}
+                <option value="{{lecture.lectures.id}}" class="cafe24">{{lecture.lectures}}</option>
+                {%endif%}
+                {%endfor%}
+            </select>
+        </div>
+        <div class="form-group col-md-4">학번
+            {% if student_id %}
+            <input class="form-control student_id cafe24" type="text" value="{{student_id}}">
+            {%else%}
+            <input class="form-control student_id cafe24" type="text" value="{{student_id}}">
+            {%endif%}
+        </div>
+        <div class="col-md-4">
+            <button type='button' class="btn btn-outline-primary btn_search cafe24">조회</button>
+        </div>
+    </div>
+</div>
+<div class="container my-3">
+    <table class="table">
+        <thead>
+            <tr class="thead-dark">
+                <th>날짜</th>
+                <th>학번</th>
+                <th>수업</th>
+                <th>로그</th>
+                <th>영상</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if userlog_list %}
+            {% for userlog in userlog_list %}
+            <tr>
+                <form class="record_detail_form" method="POST">
+                    {%csrf_token%}
+                    <td><input type="hidden" name="date" value="{{userlog.date|date:'Y-m-d'}}">{{userlog.date}}</td>
+                    <td><input type="hidden" name="username" value="{{userlog.username}}"
+                            id="log_student_id">{{userlog.username}}</td>
+                    {%for lecture in lecture_list%}
+                    {%if userlog.lecture|add:"0" == lecture.lectures.id%}
+                    <td><input type="hidden" name="lecture_id" value="{{lecture.lectures.id}}"
+                            id="log_lecture_id">{{ lecture.lectures }}</td>
+                    {%endif%}
+                    {%endfor%}
+                    <td><button class="btn btn-link" type="submit" url_data="{%url 'record_log'%}">로그 확인</button></td>
+                    <!-- <td><input type="submit" id="LogModal_btn" value="Log"/>로그 확인</td> -->
+                    <!-- <td><a href="#" id="LogModal_link">로그 확인</a></td> -->
+                    <td><button class="btn btn-link" type="submit" url_data="{%url 'record_video'%}">영상 확인</button></td>
+                </form>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="3">해당 일자의 로그 및 영상 기록이 없습니다.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 페이징처리 시작 -->
+<ul class="pagination justify-content-center">
+    <!-- 이전페이지 -->
+    {% if userlog_list.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="#" data-page="{{ userlog_list.previous_page_number }}">이전</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+    </li>
+    {% endif %}
+    <!-- 페이지리스트 -->
+    {% for page_number in userlog_list.paginator.page_range %}
+    {% if page_number >= userlog_list.number|add:-3 and page_number <= userlog_list.number|add:4 %}
+    {% if page_number == userlog_list.number %}
+    <li class="page-item active" aria-current="page">
+        <a class="page-link" href="#" data-page="{{ page_number }}">{{ page_number }}</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+        <a class="page-link" href="#" data-page="{{ page_number }}">{{ page_number }}</a>
+    </li>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    <!-- 다음페이지 -->
+    {% if userlog_list.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="#" data-page="{{ userlog_list.next_page_number }}">다음</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+    </li>
+    {% endif %}
+</ul>
+<!-- 페이징처리 끝 -->
+</div>
+
+<!-- show log Modal -->
+<div class="modal fade" id="RecordModal" tabindex="-1" aria-labelledby="RecordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+<form id="searchForm" method="GET" action="{%url 'record'%}">
+    <input type="hidden" id="date" name="date" value="{{date|default_if_none:''}}">
+    <input type="hidden" id="lecture_id" name="lecture_id" value="{{lecture_id|default_if_none:''}}">
+    <input type="hidden" id="student_id" name="student_id" value="{{student_id|default_if_none:''}}">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+</form>
+
+<script>
+    $(document).ready(function () {
+        $(".page-link").on('click', function () {
+            $("#page").val($(this).data("page"));
+            $("#searchForm").submit();
+        });
+        $(".btn_search").on('click', function () {
+            $("#date").val($(".date").val());
+            $("#lecture_id").val($(".lecture_id").val());
+            $("#student_id").val($(".student_id").val());
+            // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+            $("#page").val(1);
+            $("#searchForm").submit()
+        });
+        $("#log").on('click', function () {
+            $("#date").val($(".date").val());
+            $("#lecture_id").val($(".lecture_id").val());
+            $("#student_id").val($(".student_id").val());
+            // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+            $("#page").val(1);
+            $("#searchForm").submit()
+        });
+        
+        // Modal Ajax
+
+        // $(".record_detail_form").on("submit", function (e) {
+        //     e.preventDefault()
+        //     var form = $(this);
+        //     // alert(form.serialize());
+        //     $.ajax({
+        //         type: form.attr('method'),
+        //         url: form.attr('url_data'),
+        //         data: form.serialize(),
+        //         dataType: 'json',
+        //     }).done(function (data) {
+        //         if (data.form_is_valid) {
+        //             $('#LogModal').modal('show');
+        //             $('#LogModal .modal-content').html(data.userlog_obj);
+        //         } else {
+        //             console.log('error');
+        //         }
+        //     });
+        // });
+
+        $(".record_detail_form").on("submit", function (e) {
+            e.preventDefault()
+            var form = $(this);
+            var url_data = ($(document.activeElement).attr('url_data'));
+            $.ajax({
+                type: form.attr('method'),
+                url: url_data,
+                data: form.serialize(),
+                dataType: 'json',
+            }).done(function (data) {
+                if (data.form_is_valid) {
+                    $('#RecordModal').modal('show');
+                    $('#RecordModal .modal-content').html(data.userlog_obj);
+                } else {
+                    console.log('error');
+                }
+            });
+        });
+    });
+</script>
+{%endblock%}
