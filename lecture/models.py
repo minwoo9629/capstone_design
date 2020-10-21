@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from django.db import models
 import jsonfield
 from professor.models import Professor
@@ -7,7 +8,7 @@ class Room(models.Model):
     code = models.CharField(verbose_name="강의실 코드",max_length=20, unique=True)
     building = models.CharField(verbose_name="동",max_length=20)
     number = models.CharField(verbose_name="호수",max_length=20)
-    camera = models.GenericIPAddressField(max_length=64, verbose_name="ip카메라", null=True)
+    camera = models.CharField(max_length=64, verbose_name="ip카메라", null=True)
 
     def __str__(self):
         return self.code

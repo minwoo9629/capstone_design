@@ -18,8 +18,8 @@ from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 
 # 엑셀파일 다운로드 구현
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
+#from openpyxl import Workbook
+#from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse
 import sys, os
 import mimetypes

@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*- 
 from django.db import models
 from django.contrib.auth.models import User,Group
 from lecture.models import Lecture
 import jsonfield
-
 # Create your models here.
 
 class Attendance(models.Model):

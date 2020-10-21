@@ -36,4 +36,3 @@ class LogSerializer(serializers.ModelSerializer):
                 model = userlog
                 fields = '__all__'
 
-
