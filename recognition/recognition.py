@@ -16,7 +16,7 @@ import os
 """
 def detect_face(user_data, lec, key):
 	this_lecture = Lecture.objects.get(id=lec)
-	video_path = "http://203.230.103.202:59551/videostream.cgi?user=admin&pwd=isl7528727"
+	video_path = "your_camera_IP_here"
 	input_movie = cv2.VideoCapture(video_path)
 	#오늘 날짜
 	ymd = strftime('%Y-%m-%d',localtime(time()))
